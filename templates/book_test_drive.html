@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+{% block title %} Book Test Drive{% endblock title %}
+ {% block content %} 
+ {% load static %}
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+  }
+  .fixed-container {
+    position: relative;
+    z-index: 1;
+  }
+
+  .card {
+    width: 50%;
+    max-width: 400px;
+    margin: 200px auto 50px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    z-index: 1000;
+
+    position: relative;
+  }
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    margin-top: 10px;
+    color: #333;
+  }
+
+  input {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  .error-message {
+    color: red;
+    margin-top: 10px;
+  }
+
+  button {
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  a {
+    text-decoration: none;
+    color: #333;
+    margin-top: 10px;
+    display: block;
+    text-align: center;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="card bg-light">
+  <h2>Book a Test Drive</h2>
+  <form id="testDriveForm"
+    method="post"
+    action=""
+    class="test-drive-form"
+  >
+  {% csrf_token %}
+     {% if car %}
+    <!-- Pre-fill the car field if the car object is provided -->
+    <input
+      type="text"
+      id="car"
+      name="car"
+      value="{{ car.car_name }}"
+      readonly
+    />
+    {% else %}
+    <label for="car">Car:</label>
+    <select id="car" name="car" required>
+      {% for car in available_cars %}
+      <option value="{{ car.id }}">{{ car.car_name }}</option>
+      {% endfor %}
+    </select>
+    {% endif %}
+    <label for="customer_name">Username:</label>
+    <input type="text" id="customer_name" name="customer_name" required />
+ 
+    <label for="location">Location:</label>
+    <select id="location" name="location" onchange="toggleAddressField()">
+      <option value="home">Home</option>
+      <option value="center">Center</option>
+    </select>
+    <br>
+    
+    <!-- Address Field -->
+    <div id="addressField" style="display: none;">
+      <label for="address">Address:</label>
+      <input type="text" id="address" name="address" placeholder="Enter address" >
+    </div>
+    <div id="centerAddress" style="display: none;">
+      Car Zone Address: 123 Center Street, City, Country
+    </div>
+    <br>
+    
+    <!-- Date Field -->
+    <label for="date">Date:</label>
+    <select id="date" name="date">
+      <!-- JavaScript will populate the options -->
+    </select>
+    <br>
+    
+    <!-- Time Field -->
+    <label for="time">Time:</label>
+    <select id="time" name="time">
+      <!-- JavaScript will populate the options -->
+    </select>
+    <br>
+    
+    <!-- Button Field -->
+    <button type="submit" id="submitButton">Book Test Drive</button>
+    <button type="button" id="payButton" style="display: none;">Pay Rs. 999</button>
+    
+  </form>
+
+
+
+  <p id="refund_info" style="display: none; font-size: 16px; text-align: center;">Refundable after successful test drive</p>
+</div>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // Get the car_id from the URL query parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const carId = urlParams.get('car_id');
+
+      // If carId is not null, preselect the corresponding option in the dropdown
+      if (carId) {
+          const carSelect = document.getElementById('car');
+          const option = carSelect.querySelector(`option[value="${carId}"]`);
+          if (option) {
+              option.selected = true;
+          }
+      }
+      
+
+      generateDateOptions();
+      generateTimeOptions();
+      toggleAddressField() 
+      filterBookedDatesTimes();
+        
+    });
+      
+
+  
+  
+  function toggleAddressField() {
+    var location = document.getElementById("location").value;
+      var addressField = document.getElementById("addressField");
+      var centerAddress = document.getElementById("centerAddress");
+      var payButton = document.getElementById("payButton");
+      var submitButton = document.getElementById("submitButton");
+      var refundInfo = document.getElementById("refund_info");
+
+
+    if (location === 'home') {
+      
+        addressField.style.display = "block";
+        centerAddress.style.display = "none";
+         // Show pay button
+         payButton.style.display = "block";
+       submitButton.style.display = "none";
+        refundInfo.style.display = "block";
+
+    } else  {
+      addressField.style.display = "none";
+      centerAddress.style.display = "block";
+      payButton.style.display = "none";
+      submitButton.style.display = "block";
+      refundInfo.style.display = "none"; 
+    }
+    
+}
+// Function to handle payment with Razorpay
+document.getElementById('payButton').addEventListener('click', function() {
+  var amount = 999 * 100; // Amount in paise (Rs. 999)
+  var options = {
+    "key": "rzp_test_EnQJ2nNXIuo5cM",
+    "amount": amount,
+    "currency": "INR",
+    "name": "PAY TO CARZONE",
+    "description": "Test Drive Payment",
+    "handler": function(response) {
+      // On successful payment, submit the form
+      document.getElementById('testDriveForm').submit();
+    }
+  };
+
+  var rzp1 = new Razorpay(options);
+  rzp1.open();
+});
+function generateDateOptions() {
+  var select = document.getElementById("date");
+  var today = new Date();
+  var currentHour = today.getHours();
+  var currentMinutes = today.getMinutes();
+
+  // If the current time is after the last available time slot,
+  // increment the date by 1 to select the next day
+  if (currentHour >= 17 || (currentHour === 16 && currentMinutes >= 0)) {
+    today.setDate(today.getDate() + 1);
+   
+  }
+  select.innerHTML = '';
+
+  for (var i = 0; i < 7; i++) {
+    var date = new Date(today);
+    date.setDate(today.getDate() + i);
+    var option = document.createElement("option");
+    option.value =  formatDate(date);
+    option.textContent = formatDateDisplay(date);
+    select.appendChild(option);
+  }
+}
+function formatDate(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+// Helper function to format date for display
+function formatDateDisplay(date) {
+  return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}
+function generateTimeOptions() {
+  var select = document.getElementById("time");
+  var today = new Date();
+  var currentHour = today.getHours();
+  var currentMinute = today.getMinutes();
+  var times = [
+    "10:00 AM - 11:00 AM",
+    "11:00 AM - 12:00 PM",
+    "12:00 PM - 1:00 PM",
+    "1:00 PM - 2:00 PM",
+    "2:00 PM - 3:00 PM",
+    "3:00 PM - 4:00 PM",
+    "4:00 PM - 5:00 PM",
+    "5:00 PM - 6:00 PM"
+  ];
+  
+   // Find the index of the current time in the times array
+   
+    var startIndex = Math.floor((currentHour - 10) * 2);
+    if (currentMinute >= 30) {
+        startIndex += 1;
+    }
+    select.innerHTML = '';
+
+   // Populate the time select dropdown with time slots starting from the current hour
+   for (var i = startIndex; i < times.length; i++) {
+       var option = document.createElement("option");
+       option.value = times[i];
+       option.textContent = times[i];
+       select.appendChild(option);
+   }
+}
+  var bookedDatesTimes =  [
+    {% for date, time in booked_dates_times %}
+    { date: new Date('{{ date.year }}', '{{ date.month|add:"-1" }}', '{{ date.day }}'),
+      time: '{{ time.hour }}:{{ time.minute }}:{{ time.second }}' }
+    {% if not forloop.last %},{% endif %}
+{% endfor %}
+];
+function filterBookedDatesTimes() {
+  var dateSelect = document.getElementById('date');
+  var timeSelect = document.getElementById('time');
+  var selectedDate = dateSelect.value;
+
+  // Filter out booked times for the selected date
+  var availableTimes = [
+      "10:00 AM - 11:00 AM",
+      "11:00 AM - 12:00 PM",
+      "12:00 PM - 1:00 PM",
+      "1:00 PM - 2:00 PM",
+      "2:00 PM - 3:00 PM",
+      "3:00 PM - 4:00 PM",
+      "4:00 PM - 5:00 PM",
+      "5:00 PM - 6:00 PM"
+  ];
+
+  availableTimes = availableTimes.filter(function(time) {
+      // Split the time range to get start and end times
+      var [start, end] = time.split(' - ');
+
+      // Convert the selected date to match the format in bookedDatesTimes
+      var selectedDateTime = new Date(selectedDate + ' ' + start);
+
+      // Check if the selected date and time is in bookedDatesTimes
+      return !bookedDatesTimes.some(function(dateTime) {
+          return dateTime.date.getTime() === selectedDateTime.getTime() && dateTime.time === start;
+      });
+  });
+
+  // Update options in the time select dropdown
+  timeSelect.innerHTML = '';
+  availableTimes.forEach(function(time) {
+      var option = document.createElement('option');
+      option.value = time;
+      option.textContent = time;
+      timeSelect.appendChild(option);
+  });
+}
+
+ 
+</script>
+{% endblock content %} {% block body %} {% endblock body %}

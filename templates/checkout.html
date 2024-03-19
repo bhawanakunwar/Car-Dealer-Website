@@ -1,0 +1,373 @@
+
+
+{% block title %}{% endblock %}
+
+{% block content  %}
+{% load static %}
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, p {
+  margin: 10px 0;
+}
+
+/* Checkout container */
+.checkout-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Financier slide */
+.financier-slide {
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin: 10px;
+  max-width: 300px;
+  position: relative;
+  border-radius: 8px;
+}
+
+.financier-slide .financier-logo {
+  width: 100%;
+  height: 200px; /* Adjust height as needed */
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+.financier-slide .financier-info {
+  text-align: left;
+}
+
+.financier-slide .financier-info h3 {
+  font-size: 1.2em;
+  margin-bottom: 5px;
+  color: #333; /* Adjust color as needed */
+}
+
+.financier-slide .financier-info p {
+  margin-bottom: 5px;
+  color: #666; /* Adjust color as needed */
+}
+
+.financier-slide .contact-us-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.financier-slide .contact-us-button:hover {
+  background-color: #45a049;
+}
+
+/* Contact form overlay */
+.contact-form-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+.contact-form {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: calc(100% - 16px);
+  padding: 8px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.contact-form button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.contact-form button:hover {
+  background-color: #45a049;
+}
+
+</style>
+<div class="checkout-container">
+  <h1>Car Dealer Checkout</h1>
+
+  <!-- Financiers Carousel -->
+  <div id="financiers-carousel">
+    {% for financier in financiers %}
+    <div class="financier-slide">
+      <div class="financier-logo" style="background-image: url('{{ financier.logo.url }}');"></div>
+      <div class="financier-info">
+        <h3>{{ financier.name }}</h3>
+        <p><strong>Email:</strong> {{ financier.email }}</p>
+        <p><strong>Contact Number:</strong> {{ financier.contact_number }}</p>
+        <p><strong>Website:</strong> <a href="{{ financier.website }}" target="_blank">{{ financier.website }}</a></p>
+        <button class="contact-us-button btn btn-primary" data-target="#contact-form-overlay" data-car-name="{{ selected_car.car_name }}" data-description="{{ selected_car.description }}">Contact Us</button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="contact-form-overlay" id="contact-form-overlay">
+  <div class="contact-form">
+    <h2>Contact Us</h2>
+    <form method="post" action="{% url 'contact_form_submission' %}">
+
+          <input type="text" name="name" placeholder="Your Username">
+          <input type="tel" name="phone" placeholder="Your Mobile Number"> 
+        
+            <input type="email" name="email" placeholder="Your Email">
+            <label for="selected_car">Select a car:</label>
+            <select id="selected_car" name="selected_car">
+                {% for car in available_cars %}
+                 <option value="{{ car.id }}">{{ car.name }} - {{ car.model }}</option>
+                {% endfor %}
+            </select><br><br>
+              <textarea name="message" placeholder="Your Message"></textarea>
+              <button class="btn btn-info" type="submit">Submit</button>
+        </form>
+            
+        </div>
+      </div>
+    
+   
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const contactButtons = document.querySelectorAll('.contact-us-button');
+      
+      contactButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const targetId = this.getAttribute('data-target');
+          const contactForm = document.querySelector(targetId);
+          if (contactForm) {
+            contactForm.style.display = 'block';
+          }
+        });
+      });
+    });
+    document.getElementById("contact-form").addEventListener("submit", function(event) {
+      event.preventDefault(); // Prevent default form submission
+      
+      // Get form data
+      let formData = new FormData(this);
+      
+      // Send form data to the backend
+      fetch(this.action, {
+          method: "POST",
+          body: formData
+      })
+      .then(response => {
+          if (!response.ok) {
+              throw new Error("Network response was not ok");
+          }
+          return response.text();
+      })
+      .then(data => {
+          // Handle successful response
+          console.log("Form submitted successfully:", data);
+          // You can redirect the user to a thank you page or display a success message here
+      })
+      .catch(error => {
+          // Handle errors
+          console.error("Error submitting form:", error.message);
+          // You can display an error message to the user here
+      });
+  });
+  
+    
+        document.querySelectorAll('.contact-form').forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+                
+                // Get form data
+                let formData = new FormData(this);
+                
+                // Send form data to the backend
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // Parse response as JSON
+                })
+                .then(data => {
+                    // Handle successful response
+                    console.log('Form submitted successfully:', data);
+                    
+                    // Send data to API endpoint
+                    fetch('http://127.0.0.1:8000/financiers/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data) // Send form data as JSON to the API
+                    })
+                    .then(apiResponse => {
+                        if (!apiResponse.ok) {
+                            throw new Error('Failed to send data to API');
+                        }
+                        return apiResponse.json();
+                    })
+                    .then(apiData => {
+                        // Handle API response
+                        console.log('Data sent to API:', apiData);
+                        // You can perform further actions here if needed
+                    })
+                    .catch(error => {
+                        console.error('Error sending data to API:', error.message);
+                    });
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error('Error submitting form:', error.message);
+                    // You can display an error message to the user here
+                });
+            });
+        });
+    
+    
+   
+</script>
+<div class="order-summary">
+  <h2>Order Summary</h2>
+  {% if selected_car %}
+      <p><strong>Car Name:</strong> {{ selected_car.car_name }}</p>
+      <p><strong>Description:</strong> {{ selected_car.description }}</p>
+      <p><strong>Category:</strong> {{ selected_car.category }}</p>
+      <p><strong>Price:</strong> ${{ selected_car.price }}</p>
+      <p><strong>Make:</strong> {{ selected_car.make }}</p>
+      <p><strong>Model:</strong> {{ selected_car.model }}</p>
+      <p><strong>Year:</strong> {{ selected_car.year }}</p>
+      <p><strong>Transmission:</strong> {{ selected_car.transmission_type }}</p>
+      <!-- Add more details about the selected car as needed -->
+  {% else %}
+      <p>No car selected.</p>
+  {% endif %}
+</div>
+
+
+
+  <!-- Additional Checkout Information -->
+
+    <!-- Shipping Information Form HTML -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <form id="paymentForm" action="{% url 'payment_success' %}" method="POST">
+      <!-- Add necessary input fields for payment details -->
+      <input type="hidden" name="amount" value="200000"> <!-- Amount in paisa (e.g., ₹10 would be 1000 paisa) -->
+      <input type="hidden" name="currency" value="INR"> <!-- Currency code -->
+      <input type="hidden" name="order_id" value="{{ order_id }}"> <!-- Unique order ID -->
+      <button type="button" id="rzp-button" >Pay Rs.2000</button>
+  </form>
+  
+  <script>
+    var options = {
+        "key": "{{ settings.RAZORPAY_API_KEY }}",
+        "amount": "{{ amount }}",
+        "currency": "INR",
+        "name": "Your Company Name",
+        "description": "Payment Description",
+        "order_id": "{{ order_id }}",
+        "handler": function(response) {
+            // Handle the payment success response
+            // You can submit the form or redirect to a success page
+            document.forms[0].submit();
+        },
+        "prefill": {
+            "name": "John Doe",
+            "email": "john@example.com",
+            "contact": "9876543210"
+        }
+    };
+    var rzp = new Razorpay(options);
+    rzp.open();
+</script>
+
+
+  
+   
+
+
+
+
+  
+
+  
+
+<!-- Slick Carousel script -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script>
+  // Initialize Slick Carousel for the financiers
+  $(document).ready(function(){
+    $('#financiers-carousel').slick({
+      slidesToShow: 3, // Show three financiers in a row
+      slidesToScroll: 1,
+      autoplay: true,
+      autoplaySpeed: 3000,
+    });
+  });
+  document.getElementById('id_delivery_address_different').addEventListener('change', function () {
+    // Get the div containing delivery address details
+    var deliveryAddressDetails = document.getElementById('delivery-address-details');
+    
+    // Toggle the display based on the checkbox status
+    deliveryAddressDetails.style.display = this.checked ? 'block' : 'none';
+  
+function completePayment() {
+        // You can add your payment processing logic here
+        alert('Payment completed successfully!');
+    }
+});
+document.addEventListener('DOMContentLoaded', function() {
+  const contactButtons = document.querySelectorAll('.contact-us-button');
+  const contactForms = document.querySelectorAll('.contact-form');
+  
+  contactButtons.forEach((button, index) => {
+      button.addEventListener('click', function() {
+          contactForms[index].classList.toggle('show');
+      });
+  });
+});
+</script>
+
+
+
+{% endblock content %}

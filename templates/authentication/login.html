@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock title %}
+{% block content %}
+    <style>
+       
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+    .fixed-container {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .card {
+        width: 50%;
+        max-width: 400px;
+        margin: 200px auto 50px;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        z-index:1000;
+        
+        position: relative;
+        
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    label {
+        margin-top: 10px;
+        color: #333;
+    }
+    
+    input {
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    
+    .error-message {
+        color: red;
+        margin-top: 10px;
+    }
+    
+    button {
+        padding: 10px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    a {
+        text-decoration: none;
+        color: #333;
+        margin-top: 10px;
+        display: block;
+        text-align: center;
+    }
+    
+    a:hover {
+        text-decoration: underline;
+    }
+    </style>
+
+    <div class="card">
+        <h1>Login</h1>
+
+        <form action="{% url 'car_auth:handlelogin' %}" method="post" onsubmit="return validateForm()">
+            {% csrf_token %}
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <div class="error-message" id="error-message"></div>
+
+            <button type="submit" class="btn btn-dark">Login</button>
+
+            <br>
+            New User? <a href="/auth/signup/">Signup</a>
+        </form>
+
+        <script>
+            function validateForm() {
+                var email = document.getElementById("email").value;
+                var password = document.getElementById("password").value;
+
+                if (email === "" || password === "") {
+                    document.getElementById("error-message").innerHTML = "Email and password are required.";
+                    return false;
+                } else {
+                    document.getElementById("error-message").innerHTML = "";
+                    return true;
+                }
+            }
+        </script>
+    </div>
+{% endblock content %}

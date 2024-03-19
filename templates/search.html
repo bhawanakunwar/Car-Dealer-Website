@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Results</title>
+</head>
+<body>
+    <h1>Search Results</h1>
+    <p>Searched for: {{ query }}</p>
+    <ul>
+        {% for car in results %}
+        
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.car_name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ car.car_name }}</h5>
+                    <p class="card-text">{{ car.description }}</p>
+                    <p class="card-text">Price: {{ car.price }}</p>
+                    <a href="#" data-toggle-url="{% url 'add_to_wishlist' car_id=car.id %}" onclick="toggleWishlist(this)" data-carid="{{ car.id }}" class="btn btn-success cart btn-sm mt-0">Add to Wishlist</a>
+                    <a href="{% url 'car_detail' car_id=car.id %}" class="btn btn-primary">View Details</a>
+                    <!-- Add button to remove from wishlist -->
+                    
+                </div>
+            </div>
+        </div>
+    
+        {% endfor %}
+    </ul>
+
+    <script>
+
+        function toggleWishlist(element) {
+          var carId = element.getAttribute('data-carid');
+          var toggleUrl = element.getAttribute('data-toggle-url');
+      
+          fetch(toggleUrl, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': '{{ csrf_token }}',
+              },
+              body: JSON.stringify({
+                  carId: carId,
+              }),
+          })
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              return response.json();
+          })
+          .then(data => {
+              if (data.success !== undefined && data.added !== undefined) {
+                  if (data.success && data.added) {
+                      // Car was successfully added to the wishlist
+                      element.classList.add('active');
+                      // Disable the button after adding to wishlist
+                      element.setAttribute('disabled', true);
+                      // Optionally, you can provide feedback to the user that the car was added to the wishlist
+                      alert('Car added to wishlist!');
+                  } else {
+                      // Car was removed from the wishlist or operation failed
+                      element.classList.remove('active');
+                      // Optionally, you can provide feedback to the user that the car was removed from the wishlist
+                      alert('Car removed from wishlist!');
+                  }
+              } else {
+                  throw new Error('Unexpected response format');
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              // Handle the error gracefully (e.g., display an error message to the user)
+          });
+      }
+      </script>
+</body>
+</html>
+{% endblock content %}

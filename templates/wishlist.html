@@ -1,0 +1,60 @@
+<!-- wishlist.html -->
+
+{% extends "base.html" %}
+{% block title %}Wishlist{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Your Wishlist</h1>
+    <div class="row">
+        {% if wishlist_cars %}
+            {% for car in wishlist_cars %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.car_name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ car.car_name }}</h5>
+                            <p class="card-text">{{ car.description }}</p>
+                            <p class="card-text">Price: {{ car.price }}</p>
+                            <a href="{% url 'car_detail' car_id=car.id %}" class="btn btn-primary">View Details</a>
+                            <!-- Add button to remove from wishlist -->
+                            <button class="btn btn-danger remove-from-wishlist" data-carid="{{ car.id }}">Remove from Wishlist</button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Your wishlist is empty.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block body %}
+<script>
+    // JavaScript code to handle removing items from the wishlist
+    document.querySelectorAll('.remove-from-wishlist').forEach(button => {
+        button.addEventListener('click', function() {
+            const carId = this.getAttribute('data-carid');
+            fetch(`/remove-from-wishlist/${carId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload the page after removing from wishlist
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle the error gracefully
+            });
+        });
+    });
+</script>
+{% endblock body %}

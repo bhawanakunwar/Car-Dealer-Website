@@ -1,0 +1,16 @@
+<!-- my_account.html -->
+
+
+{% block content %}
+    <!-- Add your "My Account" content here -->
+    <h2>My Account</h2>
+    <!-- Include the header snippet -->
+    {% if user.is_authenticated %}
+        <p>Welcome, {{ user.username }}!</p>
+        <a href="{% url 'car_auth:handlelogout' %}">Logout</a>
+    {% else %}
+        <a href="{% url 'car_auth:handlelogin' %}">Login</a>
+        <!-- Add other links or navigation as needed -->
+    {% endif %}
+    <!-- Add other content specific to "My Account" -->
+{% endblock %}

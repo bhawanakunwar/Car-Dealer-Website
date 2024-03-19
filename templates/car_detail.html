@@ -1,0 +1,80 @@
+<!-- car_detail.html -->
+
+{% extends "base.html" %}
+{% block title %}
+    Car Detail
+{% endblock title %}
+
+   
+{% block content %}
+{% load static %}
+<style>
+    /* Global styles */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* Car detail styles */
+    .car-details {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    .car-details h2 {
+        margin-top: 0;
+    }
+    .car-details img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 20px;
+    }
+    .car-details p {
+        margin-bottom: 10px;
+    }
+    .car-details .btn {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .car-details .btn:hover {
+        background-color: #0056b3;
+    }
+</style>
+    <h1>Car Detail</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <img src="{{ car.image.url }}" alt="{{ car.car_name }}" class="img-fluid">
+            </div>
+            <div class="col-md-6">
+                <h2>{{ car.car_name }}</h2>
+                <p>{{ car.description }}</p>
+                <p>Category: {{ car.category }}</p>
+                <p>Price: {{ car.price }}</p>
+                <p>Make: {{ car.make }}</p>
+                <p>Model: {{ car.model }}</p>
+                <p>Year: {{ car.year }}</p>
+                <!-- Add buttons for booking a test drive and purchasing -->
+               
+                <a href="{% url 'book_test_drive_from_car_detail' car_id=car.id %}" class="btn btn-primary">Book Test Drive</a>
+
+                <a href="{% url 'checkout' car_id=car.id %}" class="btn btn-success">Buy Now</a>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

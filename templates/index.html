@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+<style>
+    .car-container {
+        margin-top: 150px; /* Adjust the margin-top value as needed */
+    }
+</style>
+<div class="welcome-hero-txt">
+  <h2>Discover a Fusion of Style and Performance</h2>
+  <p>
+    Your journey is our passion. Come, Explore, and let us redefine the way you experience driving. Your dream car and exceptional service await you. Ready to hit the road? Visit CARZONE today!
+  </p>
+  <button class="welcome-btn" onclick="window.location.href='#'">
+    Book Car
+  </button>
+</div>   
+{% endblock content %}
+{% block body %}
+{% load static %}
+<script>
+
+  function toggleWishlist(element) {
+    var carId = element.getAttribute('data-carid');
+    var toggleUrl = element.getAttribute('data-toggle-url');
+
+    fetch(toggleUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}',
+        },
+        body: JSON.stringify({
+            carId: carId,
+        }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success !== undefined && data.added !== undefined) {
+            if (data.success && data.added) {
+                // Car was successfully added to the wishlist
+                element.classList.add('active');
+                // Disable the button after adding to wishlist
+                element.setAttribute('disabled', true);
+                // Optionally, you can provide feedback to the user that the car was added to the wishlist
+                alert('Car added to wishlist!');
+            } else {
+                // Car was removed from the wishlist or operation failed
+                element.classList.remove('active');
+                // Optionally, you can provide feedback to the user that the car was removed from the wishlist
+                alert('Car removed from wishlist!');
+            }
+        } else {
+            throw new Error('Unexpected response format');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle the error gracefully (e.g., display an error message to the user)
+    });
+}
+</script>
+  
+
+<div class="container mt-4 car-container">
+    <div class="row">
+        {% for car in featured_cars %}
+            <div class="col-md-3 mt-3">
+                <img src='/media/{{ car.image }}' class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">{{ car.car_name }}</h5>
+                    <p class="card-text">{{ car.desc|slice:"0:53" }}...</p>
+                    <h6 class="card-title">Price: {{ car.price }}</h6>
+                    <!-- Add buttons or links for actions like Book Test Drive, Buy Now, View Details -->
+                    <span id="divpr{{ i.id }}" class="divpr">
+                      {% if i.id in wishlist_car_ids %}
+                          <button class="btn btn-success cart btn-sm mt-0" disabled>Added to Wishlist</button>
+                      {% else %}
+                          <a href="#" data-toggle-url="{% url 'add_to_wishlist' car_id=car.id %}" onclick="toggleWishlist(this)" data-carid="{{ i.id }}" class="btn btn-success cart btn-sm mt-0">Add to Wishlist</a>
+                      {% endif %}
+                      <a href="{% url 'car_detail' car_id=car.id %}" class="btn btn-success cart btn-sm mt-0">View</a>
+                  </span>
+                  
+
+    
+                </div>
+    
+           </div>
+          
+          
+          {% endfor %}
+    
+    
+    
+        </div>
+    
+     </div>
+     
+    
+     
+    
+      <section id="service" class="service">
+        <div class="container">
+          <div class="service-content">
+            <div class="row">
+              <div class="col-md-4 col-sm-6">
+                <div class="single-service-item">
+                  <div class="single-service-icon">
+                    <i class="flaticon-car"></i>
+                  </div>
+                  <h2>
+                    <a href="#">largest dealership <span> of</span> car</a>
+                  </h2>
+                  <p>
+                    Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
+                    odit aut den fugit sed quia.
+                  </p>
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-6">
+                <div class="single-service-item">
+                  <div class="single-service-icon">
+                    <i class="flaticon-car-repair"></i>
+                  </div>
+                  <h2><a href="#">12 month warranty</a></h2>
+                  <p>
+                    Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
+                    odit aut den fugit sed quia.
+                  </p>
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-6">
+                <div class="single-service-item">
+                  <div class="single-service-icon">
+                    <i class="flaticon-car-1"></i>
+                  </div>
+                  <h2><a href="#">finance support</a></h2>
+                  <p>
+                    Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
+                    odit aut den fugit sed quia.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--/.container-->
+      </section>
+      <section id="clients-say" class="clients-say">
+        <div class="container">
+          <div class="section-header">
+            <h2>what our clients say</h2>
+          </div>
+          <!--/.section-header-->
+          <div class="row">
+            <div class="owl-carousel testimonial-carousel">
+              <div class="col-sm-3 col-xs-12">
+                <div class="single-testimonial-box">
+                  <div class="testimonial-description">
+                    <div class="testimonial-info">
+                      <div class="testimonial-img">
+                        <img
+                          src="/static/assets/images/clients/c1.png"
+                          alt="image of clients person"
+                        />
+                      </div>
+                      <!--/.testimonial-img-->
+                    </div>
+                    <!--/.testimonial-info-->
+                    <div class="testimonial-comment">
+                      <p>
+                        Sed ut pers unde omnis iste natus error sit voluptatem
+                        accusantium dolor laudan rem aperiam, eaque ipsa quae ab
+                        illo inventore verit.
+                      </p>
+                    </div>
+                    <!--/.testimonial-comment-->
+                    <div class="testimonial-person">
+                      <h2><a href="#">tomas lili</a></h2>
+                      <h4>new york</h4>
+                    </div>
+                    <!--/.testimonial-person-->
+                  </div>
+                  <!--/.testimonial-description-->
+                </div>
+                <!--/.single-testimonial-box-->
+              </div>
+              <!--/.col-->
+              <div class="col-sm-3 col-xs-12">
+                <div class="single-testimonial-box">
+                  <div class="testimonial-description">
+                    <div class="testimonial-info">
+                      <div class="testimonial-img">
+                        <img
+                          src="/static/assets/images/clients/c2.png"
+                          alt="image of clients person"
+                        />
+                      </div>
+                      <!--/.testimonial-img-->
+                    </div>
+                    <!--/.testimonial-info-->
+                    <div class="testimonial-comment">
+                      <p>
+                        Sed ut pers unde omnis iste natus error sit voluptatem
+                        accusantium dolor laudan rem aperiam, eaque ipsa quae ab
+                        illo inventore verit.
+                      </p>
+                    </div>
+                    <!--/.testimonial-comment-->
+                    <div class="testimonial-person">
+                      <h2><a href="#">romi rain</a></h2>
+                      <h4>london</h4>
+                    </div>
+                    <!--/.testimonial-person-->
+                  </div>
+                  <!--/.testimonial-description-->
+                </div>
+                <!--/.single-testimonial-box-->
+              </div>
+              <!--/.col-->
+              <div class="col-sm-3 col-xs-12">
+                <div class="single-testimonial-box">
+                  <div class="testimonial-description">
+                    <div class="testimonial-info">
+                      <div class="testimonial-img">
+                        <img
+                          src="/static/assets/images/clients/c3.png"
+                          alt="image of clients person"
+                        />
+                      </div>
+                      <!--/.testimonial-img-->
+                    </div>
+                    <!--/.testimonial-info-->
+                    <div class="testimonial-comment">
+                      <p>
+                        Sed ut pers unde omnis iste natus error sit voluptatem
+                        accusantium dolor laudan rem aperiam, eaque ipsa quae ab
+                        illo inventore verit.
+                      </p>
+                    </div>
+                    <!--/.testimonial-comment-->
+                    <div class="testimonial-person">
+                      <h2><a href="#">john doe</a></h2>
+                      <h4>washington</h4>
+                    </div>
+                    <!--/.testimonial-person-->
+                  </div>
+                  <!--/.testimonial-description-->
+                </div>
+                <!--/.single-testimonial-box-->
+              </div>
+              <!--/.col-->
+            </div>
+            <!--/.testimonial-carousel-->
+          </div>
+          <!--/.row-->
+        </div>
+        <!--/.container-->
+      </section>
+      <section id="brand" class="brand">
+        <div class="container">
+          <div class="brand-area">
+            <div class="owl-carousel owl-theme brand-item">
+              <div class="item">
+                <a href="#">
+                  <img src="/static/assets/images/brand/br1.png" alt="brand-image" />
+                </a>
+              </div>
+              <!--/.item-->
+              <div class="item">
+                <a href="#">
+                  <img src="/static/assets/images/brand/br2.png" alt="brand-image" />
+                </a>
+              </div>
+              <!--/.item-->
+              <div class="item">
+                <a href="#">
+                  <img src="/static/assets/images/brand/br3.png" alt="brand-image" />
+                </a>
+              </div>
+              <!--/.item-->
+              <div class="item">
+                <a href="#">
+                  <img src="/static/assets/images/brand/br4.png" alt="brand-image" />
+                </a>
+              </div>
+              <!--/.item-->
+    
+              <div class="item">
+                <a href="#">
+                  <img src="/static/assets/images/brand/br5.png" alt="brand-image" />
+                </a>
+              </div>
+              <!--/.item-->
+    
+              <div class="item">
+                <a href="#">
+                  <img src="/static/assets/images/brand/br6.png" alt="brand-image" />
+                </a>
+              </div>
+              <!--/.item-->
+            </div>
+            <!--/.owl-carousel-->
+          </div>
+          <!--/.clients-area-->
+        </div>
+        <!--/.container-->
+      </section>
+
+           
+{% endblock body %}
+  
+    
+                
+               

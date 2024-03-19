@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+
+{% block navbar %}
+{% load static %}
+<style>
+    /* CSS for the navigation bar */
+.navbar {
+    background-color: #333; /* Background color of the navbar */
+    overflow: hidden;
+  }
+  
+  .navbar a {
+    float: left; /* Align links to the left */
+    display: block; /* Make links block elements */
+    color: white; /* Text color of the links */
+    text-align: center; /* Center-align text */
+    padding: 14px 16px; /* Padding for links */
+    text-decoration: none; /* Remove underline from links */
+  }
+  
+  .navbar a:hover {
+    background-color: #ddd; /* Background color on hover */
+    color: black; /* Text color on hover */
+  }
+  
+  /* Dropdown container */
+  .dropdown {
+    float: left; /* Align dropdown container to the left */
+    overflow: hidden; /* Hide dropdown content */
+  }
+  
+  /* Style the dropdown button */
+  .dropbtn {
+    font-size: 16px;
+    border: none;
+    outline: none;
+    color: white;
+    padding: 14px 16px;
+    background-color: inherit; /* Inherit background color from parent */
+    font-family: inherit; /* Inherit font family from parent */
+    margin: 0; /* Remove margin */
+  }
+  
+  /* Style the dropdown content (hidden by default) */
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9; /* Background color of dropdown */
+    min-width: 160px; /* Minimum width of dropdown content */
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); /* Box shadow */
+    z-index: 1; /* Set z-index to bring dropdown content to the front */
+  }
+  
+  /* Style the links inside the dropdown */
+  .dropdown-content a {
+    float: none; /* Remove float */
+    color: black; /* Text color */
+    padding: 12px 16px; /* Padding */
+    text-decoration: none; /* Remove underline */
+    display: block; /* Make links block elements */
+    text-align: left; /* Left-align text */
+  }
+  
+  /* Add a grey background color to dropdown links on hover */
+  .dropdown-content a:hover {
+    background-color: #ddd;
+  }
+  
+  /* Show the dropdown content when the dropdown button is hovered over */
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+  
+    
+</style>
+<div class="navbar">
+    <a href="">Home</a>
+    <a href="#">Cars</a>
+    <a href="#">Book Test Drive</a>
+    <a href="#">Book Service</a>
+    <div class="dropdown">
+      <button class="dropbtn" id="historyBtn">History ▼</button>
+      <div class="dropdown-content"  id="historyDropdown">
+        <a href="#">Order History</a>
+        <a href="/book_test_drive/">Test Drive History</a>
+        <a href="/book_service/">Service History</a>
+        <a href="#">Finance History</a>
+        <a href="#">Insurance History</a>
+      </div>
+    </div>
+    <a href="#">My Profile</a>
+  </div>
+  
+{% endblock navbar %}
+
+
+
+{% block content %}
+<style>
+    .car-container {
+        margin-top: 150px; /* Adjust the margin-top value as needed */
+    }
+    
+</style>
+<div class="welcome-hero-txt">
+    <h2>Discover a Fusion of Style and Performance</h2>
+    <p>
+      Your journey is our passion. Come, Explore, and let us redefine the way you experience driving. Your dream car and exceptional service await you. Ready to hit the road? Visit CARZONE today!
+    </p>
+    <button class="welcome-btn" onclick="window.location.href='#'">
+      Buy Car
+    </button>
+  </div>   
+{% endblock content %}
+{% block body %}
+{% load static %}
+
+<div class="container mt-4 car-container ">
+    <div class="row">
+{% for car,range,nSlides in allCars  %}
+
+    <h3 class="my-3 text-center text-success bg-light">{{car.0.category}} Flashsale</h3>
+
+ <div class="container mt-3" >
+    <div class="row">
+        {% for i in car  %}
+         <div class="col-md-3 mt-3">
+            <img src='/media/{{i.image}}'class="card-img-top " alt="...">
+              <div class="card-body">
+                <h5 class="card-title" id="namepr{{i.id}}">{{i.car_name}}</h5>
+                <p class="card-text">{{i.desc|slice:"0:53"}}...</p>
+                <h6 class="card-title">
+                    Price:<span id="pricepr{{i.id}}">{{i.price}}</span></h6>
+                <span id="divpr{{i.id}}" class="divpr">
+                    <button id="" class="btn btn-success cart btn-sm mt-0">
+                        Book Test Drive
+                    </button>
+                    <button id="" class="btn btn-success cart btn-sm mt-0">
+
+                       Buy Now
+                    </button>
+                </span>
+                <a href="/media/{{i.image}}">
+                    <button class="btn btn-success btn-sm cart">View</button>
+
+                </a>
+
+              </div>
+
+         </div>
+        
+        
+        {% endfor %}
+
+    </div>
+
+ </div>
+</div>
+</div>
+ {% endfor %}
+
+  <section id="service" class="service">
+    <div class="container">
+      <div class="service-content">
+        <div class="row">
+          <div class="col-md-4 col-sm-6">
+            <div class="single-service-item">
+              <div class="single-service-icon">
+                <i class="flaticon-car"></i>
+              </div>
+              <h2>
+                <a href="#">largest dealership <span> of</span> car</a>
+              </h2>
+              <p>
+                Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
+                odit aut den fugit sed quia.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-4 col-sm-6">
+            <div class="single-service-item">
+              <div class="single-service-icon">
+                <i class="flaticon-car-repair"></i>
+              </div>
+              <h2><a href="#">unlimited repair warrenty</a></h2>
+              <p>
+                Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
+                odit aut den fugit sed quia.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-4 col-sm-6">
+            <div class="single-service-item">
+              <div class="single-service-icon">
+                <i class="flaticon-car-1"></i>
+              </div>
+              <h2><a href="#">insurance support</a></h2>
+              <p>
+                Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
+                odit aut den fugit sed quia.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/.container-->
+  </section>
+  <section id="clients-say" class="clients-say">
+    <div class="container">
+      <div class="section-header">
+        <h2>what our clients say</h2>
+      </div>
+      <!--/.section-header-->
+      <div class="row">
+        <div class="owl-carousel testimonial-carousel">
+          <div class="col-sm-3 col-xs-12">
+            <div class="single-testimonial-box">
+              <div class="testimonial-description">
+                <div class="testimonial-info">
+                  <div class="testimonial-img">
+                    <img
+                      src="/static/assets/images/clients/c1.png"
+                      alt="image of clients person"
+                    />
+                  </div>
+                  <!--/.testimonial-img-->
+                </div>
+                <!--/.testimonial-info-->
+                <div class="testimonial-comment">
+                  <p>
+                    Sed ut pers unde omnis iste natus error sit voluptatem
+                    accusantium dolor laudan rem aperiam, eaque ipsa quae ab
+                    illo inventore verit.
+                  </p>
+                </div>
+                <!--/.testimonial-comment-->
+                <div class="testimonial-person">
+                  <h2><a href="#">tomas lili</a></h2>
+                  <h4>new york</h4>
+                </div>
+                <!--/.testimonial-person-->
+              </div>
+              <!--/.testimonial-description-->
+            </div>
+            <!--/.single-testimonial-box-->
+          </div>
+          <!--/.col-->
+          <div class="col-sm-3 col-xs-12">
+            <div class="single-testimonial-box">
+              <div class="testimonial-description">
+                <div class="testimonial-info">
+                  <div class="testimonial-img">
+                    <img
+                      src="/static/assets/images/clients/c2.png"
+                      alt="image of clients person"
+                    />
+                  </div>
+                  <!--/.testimonial-img-->
+                </div>
+                <!--/.testimonial-info-->
+                <div class="testimonial-comment">
+                  <p>
+                    Sed ut pers unde omnis iste natus error sit voluptatem
+                    accusantium dolor laudan rem aperiam, eaque ipsa quae ab
+                    illo inventore verit.
+                  </p>
+                </div>
+                <!--/.testimonial-comment-->
+                <div class="testimonial-person">
+                  <h2><a href="#">romi rain</a></h2>
+                  <h4>london</h4>
+                </div>
+                <!--/.testimonial-person-->
+              </div>
+              <!--/.testimonial-description-->
+            </div>
+            <!--/.single-testimonial-box-->
+          </div>
+          <!--/.col-->
+          <div class="col-sm-3 col-xs-12">
+            <div class="single-testimonial-box">
+              <div class="testimonial-description">
+                <div class="testimonial-info">
+                  <div class="testimonial-img">
+                    <img
+                      src="/static/assets/images/clients/c3.png"
+                      alt="image of clients person"
+                    />
+                  </div>
+                  <!--/.testimonial-img-->
+                </div>
+                <!--/.testimonial-info-->
+                <div class="testimonial-comment">
+                  <p>
+                    Sed ut pers unde omnis iste natus error sit voluptatem
+                    accusantium dolor laudan rem aperiam, eaque ipsa quae ab
+                    illo inventore verit.
+                  </p>
+                </div>
+                <!--/.testimonial-comment-->
+                <div class="testimonial-person">
+                  <h2><a href="#">john doe</a></h2>
+                  <h4>washington</h4>
+                </div>
+                <!--/.testimonial-person-->
+              </div>
+              <!--/.testimonial-description-->
+            </div>
+            <!--/.single-testimonial-box-->
+          </div>
+          <!--/.col-->
+        </div>
+        <!--/.testimonial-carousel-->
+      </div>
+      <!--/.row-->
+    </div>
+    <!--/.container-->
+  </section>
+  <section id="brand" class="brand">
+    <div class="container">
+      <div class="brand-area">
+        <div class="owl-carousel owl-theme brand-item">
+          <div class="item">
+            <a href="#">
+              <img src="/static/assets/images/brand/br1.png" alt="brand-image" />
+            </a>
+          </div>
+          <!--/.item-->
+          <div class="item">
+            <a href="#">
+              <img src="/static/assets/images/brand/br2.png" alt="brand-image" />
+            </a>
+          </div>
+          <!--/.item-->
+          <div class="item">
+            <a href="#">
+              <img src="/static/assets/images/brand/br3.png" alt="brand-image" />
+            </a>
+          </div>
+          <!--/.item-->
+          <div class="item">
+            <a href="#">
+              <img src="/static/assets/images/brand/br4.png" alt="brand-image" />
+            </a>
+          </div>
+          <!--/.item-->
+
+          <div class="item">
+            <a href="#">
+              <img src="/static/assets/images/brand/br5.png" alt="brand-image" />
+            </a>
+          </div>
+          <!--/.item-->
+
+          <div class="item">
+            <a href="#">
+              <img src="/static/assets/images/brand/br6.png" alt="brand-image" />
+            </a>
+          </div>
+          <!--/.item-->
+        </div>
+        <!--/.owl-carousel-->
+      </div>
+      <!--/.clients-area-->
+    </div>
+    <!--/.container-->
+  </section>
+  
+       
+  {% endblock body %}
+
+

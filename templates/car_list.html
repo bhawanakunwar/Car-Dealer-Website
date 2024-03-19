@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Car List{% endblock title %}
+
+{% block content %}
+<div class="container mt-4 car-container">
+    <div class="row">
+        {% for car, range, nSlides in allCars  %}
+            <h3 class="my-3 text-center text-success bg-light">{{ car.0.category }} Flashsale</h3>
+
+            <div class="container mt-3">
+                <div class="row">
+                    {% for i in car %}
+                        <div class="col-md-3 mt-3">
+                            <img src='/media/{{ i.image }}' class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title" id="namepr{{ i.id }}">{{ i.car_name }}</h5>
+                                <p class="card-text">{{ i.description|slice:"0:53" }}...</p>
+                                <h6 class="card-title">
+                                    Price: <span id="pricepr{{ i.id }}">{{ i.price }}</span>
+                                </h6>
+                                <span id="divpr{{ i.id }}" class="divpr">
+                                    {% if i.id in wishlist_car_ids %}
+                                        <button class="btn btn-success cart btn-sm mt-0" disabled>Added to Wishlist</button>
+                                    {% else %}
+                                        <a href="#" data-toggle-url="{% url 'add_to_wishlist' car_id=i.id %}" onclick="toggleWishlist(this)" data-carid="{{ i.id }}" class="btn btn-success cart btn-sm mt-0">Add to Wishlist</a>
+                                    {% endif %}
+                                    <a href="{% url 'car_detail' car_id=i.id %}" class="btn btn-success cart btn-sm mt-0">View</a>
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block body %}
+<script>
+    function toggleWishlist(element) {
+        var carId = element.getAttribute('data-carid');
+        var toggleUrl = element.getAttribute('data-toggle-url');
+    
+        fetch(toggleUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({
+                carId: carId,
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success !== undefined && data.added !== undefined) {
+                if (data.success && data.added) {
+                    // Car was successfully added to the wishlist
+                    element.classList.add('active');
+                    // Disable the button after adding to wishlist
+                    element.setAttribute('disabled', true);
+                    // Optionally, you can provide feedback to the user that the car was added to the wishlist
+                    alert('Car added to wishlist!');
+                } else {
+                    // Car was removed from the wishlist or operation failed
+                    element.classList.remove('active');
+                    // Optionally, you can provide feedback to the user that the car was removed from the wishlist
+                    alert('Car removed from wishlist!');
+                }
+            } else {
+                throw new Error('Unexpected response format');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle the error gracefully (e.g., display an error message to the user)
+        });
+    }
+</script>
+{% endblock body %}
