@@ -1,43 +1,53 @@
 <!-- authentication/signup.html -->
 
-
-{% load static %}
+{% extends "base.html" %}
 {% block title %}Sign up{% endblock title %}
-{% block content%}
+{% block content %}{% endblock content %}
+{% block body %}
+{% load static %}
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 0;
-    }
-    .fixed-container {
-        position: relative;
-        z-index: 1;
+    nav.navbar.bootsnav {
+        background-color: #000  !important;   /* Change to your desired background color */
+        border-bottom: none  !important;   /* Remove bottom border if not needed */
     }
     
-    .card {
-        width: 50%;
-        max-width: 400px;
-        margin: 200px auto 50px;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        background-color: #fff;
-        z-index:1000;
-        
-        position: relative;
-        
+    /* Make the navbar sticky */
+    nav.navbar.bootsnav.navbar-sticky {
+        position: fixed  !important;
+        top: 0  !important;
+        width: 100%  !important;
+        z-index: 1000  !important; /* Adjust z-index as needed */
     }
+      
+</style>
+
+<style>
+   .card {
+    width: 80%; /* Adjust the width as needed */
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    z-index: 1000;
+    position: fixed;
+    top: calc(50% + 100px); /* Fixed at 50% from the top */
+    left: 50%; /* Fixed at 50% from the left */
+    transform: translate(-50%, -50%);
+    overflow-y: auto;  
+    height:60%; 
+
+  }
     h1 {
         text-align: center;
         color: #333;
     }
-    
-    form {
+    .signup-form {
         display: flex;
         flex-direction: column;
-    }
+      }
+    
     
     label {
         margin-top: 10px;
@@ -64,6 +74,9 @@
         border-radius: 5px;
         cursor: pointer;
     }
+    button:hover {
+        background-color: #444; /* Darken the background color slightly */
+    }
     
     a {
         text-decoration: none;
@@ -77,16 +90,33 @@
         text-decoration: underline;
     }
 </style>
-<div class="fixed-container"> 
+
+<div   style="padding-top: 800px; padding-bottom: 100px;">
 <div class="card bg-light">
     
 
 
  <h1>User Signup</h1>
 
-    <form  action="{% url 'car_auth:signup'   %}" method="POST"  onsubmit="return validateForm()">
+    <form  action="{% url 'car_auth:signup'   %}" class="signup-form"method="POST"  onsubmit="return validateForm()">
    
         {% csrf_token %}
+        <center>
+        
+        {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == "error" %}
+        <div class ="alert alert-danger" role="alert">
+        {{message}}
+        </div>
+        {% else %}
+        <div class="alert alert-success" role="alert">
+        {{message}}
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        </center>
         <br>
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
@@ -106,65 +136,16 @@
         <div id="errorMessages" style="color: red;"></div>
         <button type="submit" class="btn btn-dark">Sign Up</button>
         <br>
-        Already User?<a href="/auth/login/">Login</a>
+        Already User?<a href="{% url 'car_auth:handlelogin' %}">Login</a>
         <br>
         
     </form>
 
-    <script>
-        function validateForm() {
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
-            var confirmPassword = document.getElementById("confirm_password").value;
-            var email = document.getElementById("email").value;
-            var phone = document.getElementById("mob_number").value;
-            var errorMessages = "";
-
-            if (username == "" || password == "" || confirmPassword == "" || email == "" || phone == "") {
-                errorMessages += "All fields must be filled out<br>";
-                return false;
-            }
     
-            if (password != confirmPassword) {
-                errorMessages += "Passwords do not match<br>";
-                return false;
-            }
-    
-            if (!isValidEmail(email)) {
-                errorMessages += "Invalid email address";
-                return false;
-            }
-    
-            if (!isValidPhoneNumber(phone)) {
-                errorMessages += "Invalid phone number. Phone number must be 10 digits";
-                return false;
-            }
-    
-            if (password.length < 8) {
-                errorMessages += "Password must be at least 8 characters long";
-                return false;
-            }
-            document.getElementById("errorMessages").innerHTML = errorMessages;
-
-            // Return false if there are any error messages, indicating form submission should be prevented
-            return errorMessages === "";
-    
-            return true;
-        }
-    
-        function isValidEmail(email) {
-            var emailRegex = /\S+@\S+\.\S+/;
-            return emailRegex.test(email);
-        }
-    
-        function isValidPhoneNumber(phone) {
-            var phoneRegex = /^\d{10}$/;
-            return phoneRegex.test(phone);
-        }
-    </script>
+</div>
 </div>
 </div>
 
 
 
-{% endblock content %}
+{% endblock body %}

@@ -13,6 +13,7 @@ from django.db.models import Count
 import razorpay
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from django.contrib import messages
 
 
 def index(request):
@@ -37,13 +38,15 @@ def book_test_drive(request,car_id=None):
         # Assuming you have a TestDrive model to save the form data
         car_id = request.POST.get('car')
         
-        customer_name = request.POST.get('customer_name')
+        customer_name = request.user.username 
         location = request.POST.get('location')
         address = request.POST.get('address', '') # Address might not be present if location is 'center'
-        date = request.POST.get('date')
-        time = request.POST.get('time')
+        date_str = request.POST.get('date')
+        time_range_str = request.POST.get('time')
+        date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        start_time_str = time_range_str.split(' - ')[0]  # Extract the start time
+        time = datetime.strptime(start_time_str, '%I:%M %p').time() 
 
-        # Save the form data to the database
         test_drive = TestDrive(
             car_id=car_id,
             customer_name=customer_name,
@@ -52,48 +55,44 @@ def book_test_drive(request,car_id=None):
             date=date,
             time=time
         )
+        current_datetime = datetime.now()
+        if date < current_datetime.date() or (date == current_datetime.date() and time < current_datetime.time()):
+            test_drive.status = "Completed"
+        elif date == current_datetime.date() and time == current_datetime.time():
+            test_drive.status = "Pending"
+        else:
+            test_drive.status = "Pending"
+        
         test_drive.save()
 
         # Return a JSON response indicating success
-        return JsonResponse({'success': True})
+        messages.success(request,"Test Drive Booked Successfully")
+        return redirect('book_test_drive')
     else:
         # Handle GET requests for the form here if needed
         available_cars = Car.objects.all()  # Fetch available cars from the database
-        return render(request, 'book_test_drive.html', {'available_cars': available_cars})
+        return render(request, 'book_test_drive.html', {'available_cars': available_cars,'username': request.user.username})
 
-
+    
 
   
 
-@login_required(login_url="/auth/login")    
-def create_razorpay_order(request):
-    amount = 999 
-    order_data = {
-        'amount': amount * 100,  # Razorpay requires amount in paise
-        'currency': 'INR',
-        'receipt': 'receipt_order_74394',  # You can generate a dynamic receipt ID
-    }
-    order = razorpay_client.order.create(data=order_data)
-    return JsonResponse(order)
-def razorpay_callback(request):
-    if request.method == 'POST':
-        payload = request.body.decode('utf-8')
-        return JsonResponse({'status': 'success'}) 
 
-
-
-
-
+@login_required(login_url="/auth/login") 
 def book_test_drive_from_car_detail(request, car_id):
     car = get_object_or_404(Car, pk=car_id)
     
     if request.method == 'POST':
     
-        customer_name = request.POST.get('customer_name')
+        customer_name = request.user.username 
         location = request.POST.get('location')
         address = request.POST.get('address', '') # Address might not be present if location is 'center'
-        date = request.POST.get('date')
-        time = request.POST.get('time')
+        date_str = request.POST.get('date')
+        time_range_str = request.POST.get('time')
+        date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        start_time_str = time_range_str.split(' - ')[0]  # Extract the start time
+        time = datetime.strptime(start_time_str, '%I:%M %p').time() 
+
 
         # Save the form data to the database
         test_drive = TestDrive(
@@ -104,16 +103,25 @@ def book_test_drive_from_car_detail(request, car_id):
             date=date,
             time=time
         )
+        current_datetime = datetime.now()
+        if date < current_datetime.date() or (date == current_datetime.date() and time < current_datetime.time()):
+            test_drive.status = "Completed"
+        elif date == current_datetime.date() and time == current_datetime.time():
+            test_drive.status = "Pending"
+        else:
+            test_drive.status = "Pending"
+        
         test_drive.save()
 
         # Return a JSON response indicating success
-        return JsonResponse({'success': True})
+        messages.success(request,"Test Drive Booked Successfully")
+        return redirect('car_detail', car_id=car.id)
     else:
         
         available_cars = Car.objects.all()  # Fetch available cars from the database
      
         
-        return render(request, 'book_test_drive.html', {'car':car,'available_cars': available_cars})
+        return render(request, 'book_test_drive.html', {'car':car,'available_cars': available_cars,'username': request.user.username})
 
 
 
@@ -128,7 +136,7 @@ def book_service(request,car_id=None):
         # Retrieve form data
         car_id = request.POST.get('car')
         car = get_object_or_404(Car, pk=car_id)
-        customer_name = request.POST.get('customer_name')
+        customer_name = request.user.username  
         location = request.POST.get('location')
         address = request.POST.get('address', '')  # Address might not be present if location is 'center'
         service_type = request.POST.get('service_type')
@@ -147,16 +155,22 @@ def book_service(request,car_id=None):
             time=time,
             comments=comments
         )
+        current_datetime = datetime.now()
+        if date < current_datetime.date() or (date == current_datetime.date() and time < current_datetime.time()):
+            service_booking.status = "Completed"
+        elif date == current_datetime.date() and time == current_datetime.time():
+            service_booking.status = "Pending"
+        else:
+            service_booking.status = "Pending"
         service_booking.save()
 
-        # Return a JSON response indicating success
-        return JsonResponse({'success': True})
+        messages.success(request,"Service Booked Successfully")
+        return redirect('book_service')
+        
     else:
         # Handle GET requests for the form here if needed
-        available_cars = Car.objects.all()  # Fetch available cars from the database
-        return render(request, 'book_service.html', {'available_cars': available_cars})
-
-
+       ordered_cars = Car.objects.filter(order__user=request.user)
+       return render(request, 'book_service.html', {'ordered_cars': ordered_cars,'username': request.user.username})
 def car_list(request):
     allCars=[]
     catCars=Car.objects.values('category','id')
@@ -172,54 +186,90 @@ def car_list(request):
 from .models import Car, Financier
 import razorpay
 from django.conf import settings
-client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET_KEY))
+from cardealer.settings import RAZORPAY_API_KEY,RAZORPAY_API_SECRET_KEY
+
+client = razorpay.Client(auth=(RAZORPAY_API_KEY, RAZORPAY_API_SECRET_KEY))
+
 @login_required(login_url="/auth/login") 
 def checkout(request, car_id):
     selected_car = None
     if car_id:
-         selected_car = Car.objects.get( pk=car_id)
+        selected_car = Car.objects.get(pk=car_id)
+
     financiers = Financier.objects.all()[:3]
     available_cars = Car.objects.all()  
-    return render(request, 'checkout.html', {'selected_car': selected_car, 'financiers': financiers,'available_cars': available_cars})
 
-def initiate_payment(amount, currency='INR'):
-   data = {
-       'amount': amount * 100,  # Razorpay expects amount in paise (e.g., 100 INR = 10000 paise)
-       'currency': currency,
-       'payment_capture': '1'  # Auto capture the payment after successful authorization
-   }
-   response = client.order.create(data=data)
-   return response['id']
+    # Razorpay setup
+    order_amount = 200000
+    order_currency = 'INR'
 
+    user = request.user
+    username = user.username
+    email = user.email
+    mob_number = user.mob_number 
 
-def payment_view(request):
-   amount = 100  # Set the amount dynamically or based on your requirements
-   order_id = initiate_payment(amount)
-   context = {
-       'order_id': order_id,
-       'amount': amount
-   }
-   return render(request, 'payment.html', context)
+    # Create Razorpay payment order
+    payment_order = client.order.create(dict(amount=order_amount, currency=order_currency, payment_capture=1))
+    payment_order_id = payment_order['id']
 
-def payment_success_view(request):
-   order_id = request.POST.get('order_id')
-   payment_id = request.POST.get('razorpay_payment_id')
-   signature = request.POST.get('razorpay_signature')
-   params_dict = {
-       'razorpay_order_id': order_id,
-       'razorpay_payment_id': payment_id,
-       'razorpay_signature': signature
-   }
-   try:
-       client.utility.verify_payment_signature(params_dict)
-       # Payment signature verification successful
-       # Perform any required actions (e.g., update the order status)
-       return render(request, 'payment_success.html')
-   except razorpay.errors.SignatureVerificationError as e:
-       # Payment signature verification failed
-       # Handle the error accordingly
-       return render(request, 'payment_failure.html')
+    context = {
+        'selected_car': selected_car,
+        'financiers': financiers,
+        'available_cars': available_cars,
+        'amount': 2000,
+        'api_key': RAZORPAY_API_KEY,
+        'order_id': payment_order_id,'username': username,
+        'email': email,
+        'mob_number': mob_number
+    }
+    
+    # Pass context to the template
+    return render(request, 'checkout.html', context)
+from .models import Reservation
+import uuid
+from datetime import datetime, timedelta
+from django.urls import reverse
 
+@login_required(login_url="/auth/login") 
+def payment_success(request):
+    if request.method == 'POST':
+        # Handle payment success
+        order_id = request.POST.get('razorpay_order_id')
+        payment_id = request.POST.get('razorpay_payment_id')
+        
+        # Generate a unique token ID
+        token_id = str(uuid.uuid4())
+        
+        # Assuming user and car details are available in the request or can be fetched
+        user = request.user  # Assuming user is authenticated
+        car_id = request.POST.get('car_id')  # Assuming you're passing car_id in the request
+        
+        # Retrieve the car object
+        car = Car.objects.get(pk=car_id)
+        current_date = timezone.now().date()
+        expiration_date = current_date + timedelta(days=7)
+        status = 'valid'
+        if expiration_date < current_date:
+            status = 'expired'
+        # Create a new Reservation with the payment and order IDs
+        reservation = Reservation.objects.create(
+            user=user,
+            car=car,
+            reservation_date=timezone.now(),
+            expiration_date=timezone.now() + timedelta(days=7),  # Adjust expiration date as needed
+            token_amount=2000,  # Assuming a fixed token amount, you can adjust this as needed
+            is_active=True,
+            order_id=order_id,
+            payment_id=payment_id,
+            token_id=token_id,
+            status=status 
+        )
+        
+        messages.success(request,"Payment Successful! Token generated.")
+        return redirect(reverse('checkout', kwargs={'car_id': car_id}))
+    else:
+        messages.error(request,"Invalid Request")
+        return redirect('checkout') 
 
 import requests
 from django.http import HttpResponse, JsonResponse
@@ -229,9 +279,12 @@ from .models import ContactFormSubmission
 @login_required(login_url="/auth/login") 
 def contact_form_submission(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
-        phone = request.POST.get('phone')
-        email = request.POST.get('email')
+    
+        # Get user's details
+        user = request.user
+        name = user.username
+        email = user.email
+        phone = user.mob_number
         message = request.POST.get('message')
         selected_car_id = request.POST.get('selected_car') # Extract selected car ID from the form data
         selected_car = None
@@ -243,11 +296,11 @@ def contact_form_submission(request):
         
         
         
-        return HttpResponse('Submitted successfully and sent to API')
-       
+        messages.success(request,"Form Submitted successfully")
+        return redirect('checkout', car_id=selected_car_id)  
     else:  
-        return redirect('home')
-       
+           messages.error(request, "Failed to submit form")
+           return redirect('checkout', car_id=selected_car_id) 
        
         
        
@@ -255,6 +308,7 @@ def contact_form_submission(request):
 
         # Return an error response for unsupported methods
         
+
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -318,7 +372,13 @@ from .models import Car
 
 def car_detail(request, car_id):
     car = get_object_or_404(Car, pk=car_id)
-    return render(request, 'car_detail.html', {'car': car})
+    current_user = request.user
+    has_booked_test_drive = TestDrive.objects.filter(car=car, customer_name=current_user.username, date=timezone.now().date(), time__gte=timezone.now().strftime('%H:%M')).exists()
+    context = {
+        'car': car,
+        'has_booked_test_drive': has_booked_test_drive
+    }
+    return render(request, 'car_detail.html', context)
 
 
 def purchase_car(request, car_id):
@@ -345,7 +405,8 @@ def wishlist(request):
     wishlist, created = Wishlist.objects.get_or_create(user=request.user)
     wishlist_car_ids = wishlist.cars.values_list('id', flat=True)
     return render(request, 'wishlist.html', {'wishlist_cars': wishlist.cars.all(),})
-
+from .models import Order
+from datetime import datetime, date
 @login_required(login_url="/auth/login") 
 def user_history(request):
     user = request.user
@@ -354,11 +415,45 @@ def user_history(request):
     service_bookings = ServiceBooking.objects.filter(customer_name=user.username)
     test_drives = TestDrive.objects.filter(customer_name=user.username)
     loan_applications = LoanApplication.objects.filter(name=user.username)
+    reservations = Reservation.objects.filter(user=user)
+    orders = Order.objects.filter(user=user) 
     
-    return render(request, 'user_history.html', {'service_bookings': service_bookings, 'test_drives': test_drives, 'loan_applications': loan_applications})
+    
+    current_date = date.today()
+    current_time = datetime.now().time()
+    
+    for test_drive in test_drives:
+        time_str = test_drive.time
+        if " - " in time_str:
+            start_time_str, end_time_str = time_str.split(" - ")
+            start_time = datetime.strptime(start_time_str.strip(), '%I:%M %p').time()
+            end_time = datetime.strptime(end_time_str.strip(), '%I:%M %p').time()
 
+            if current_date > test_drive.date or (current_date == test_drive.date and current_time > end_time):
+                test_drive.status = "Completed"
+            elif current_date == test_drive.date and current_time >= start_time:
+                test_drive.status = "In Progress"
+            else:
+                test_drive.status = "Pending"
 
+    for service_booking in service_bookings:
+        time_str = service_booking.time
+        if " - " in time_str:
+            start_time_str, end_time_str = time_str.split(" - ")
+            start_time = datetime.strptime(start_time_str.strip(), '%I:%M %p').time()
+            end_time = datetime.strptime(end_time_str.strip(), '%I:%M %p').time()
 
+            if current_date > service_booking.date or (current_date == service_booking.date and current_time > end_time):
+                service_booking.status = "Completed"
+            elif current_date == service_booking.date and current_time >= start_time:
+                service_booking.status = "In Progress"
+            else:
+                service_booking.status = "Pending"
 
-
-
+    for reservation in reservations:
+        expiration_datetime = reservation.expiration_date
+        if expiration_datetime.date() < current_date:
+            reservation.status = "Expired"
+        else:
+            reservation.status = "Valid"
+    return render(request, 'user_history.html', {'service_bookings': service_bookings, 'test_drives': test_drives, 'loan_applications': loan_applications, 'reservations': reservations, 'orders': orders, 'current_date': current_date, 'current_time': current_time})

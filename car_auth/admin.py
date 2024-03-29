@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.models import LogEntry
 from .models import CustomUser
 
-admin.site.register(CustomUser, UserAdmin)
+
 
 # Update the LogEntry model to use your custom user model
 from django.contrib.auth import get_user_model
@@ -18,13 +18,10 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
-class FinancierAdminSite(admin.AdminSite):
-    site_header = 'Financier Administration'
-    site_title = 'Financier Admin'
+class CustomUserAdmin(UserAdmin):
+    list_display = ('email', 'username', 'mob_number')  # Removed 'is_email_verified'
+    list_filter = ('is_staff', 'is_superuser', 'groups', 'user_permissions')
+    search_fields = ('email', 'username', 'mob_number')
+    ordering = ('email',)
 
-    def each_context(self, request):
-        context = super().each_context(request)
-        context['financier_dashboard_url'] = reverse('financier_dashboard')
-        return context
-
-admin_site = FinancierAdminSite(name='financier_admin')
+admin.site.register(CustomUser, CustomUserAdmin)

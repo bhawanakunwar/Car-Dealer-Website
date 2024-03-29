@@ -182,6 +182,9 @@ MESSAGE_TAGS={
 }
 
 AUTH_USER_MODEL = 'car_auth.CustomUser'
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY="same-origin-allow-popups"
+
 RAZORPAY_API_KEY='rzp_test_EnQJ2nNXIuo5cM'
 RAZORPAY_API_SECRET_KEY='Ex59lRId5ZgCAxWWFiqcwiN3'
 

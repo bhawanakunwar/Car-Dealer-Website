@@ -130,10 +130,15 @@ html,body{height: 100%;}
         2. Top-area
 --------------------------------------*/
 nav.navbar.bootsnav {
-    background-color: transparent;
-    border-bottom: transparent;
+    background-color: #000; 
+    border-bottom: none;
 }
-.wrap-sticky nav.navbar.bootsnav.sticked {background-color: #000;box-shadow: 0 2px 5px rgba(0,0,0,.2);}
+.wrap-sticky nav.navbar.bootsnav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
 
 /*.navbar-brand*/
 .navbar-header a.navbar-brand,.navbar-header a.navbar-brand:hover,.navbar-header a.navbar-brand:focus{

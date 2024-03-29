@@ -1,32 +1,180 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User History</title>
-</head>
-<body>
-    <h1>User History</h1>
+{% extends "base.html" %}
+{% block title %}User History{% endblock title %}
 
-    <h2>Service Bookings</h2>
+{% block content %}{% endblock content %}
+
+{% block body %}
+{% load static %}
+<style>
+    nav.navbar.bootsnav {
+        background-color: #000; /* Change to your desired background color */
+        border-bottom: none; /* Remove bottom border if not needed */
+    }
+    
+    /* Make the navbar sticky */
+    nav.navbar.bootsnav.navbar-sticky {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000; /* Adjust z-index as needed */
+    }
+</style>
+<style>
+    /* Style for the "My History" page */
+.my-history-container {
+    padding-top: 30px;
+    padding-bottom: 50px;
+    margin: 0 auto;
+    max-width: 800px; /* Adjust as needed */
+    
+}
+
+.my-history-container h1 {
+    font-size: 36px;
+    color: #fff; /* Light color for heading text */
+    background-color: #333; /* Dark background color for heading */
+    padding: 20px; /* Add padding to the heading */
+    margin-bottom: 20px;
+}
+
+.my-history-container h2 {
+    font-size: 24px;
+    color: #fff; /* Light color for h2 text */
+    background-color: #555; /* Dark background color for h2 */
+    padding: 20px; /* Add padding to h2 */
+    margin-top: 20px; /* Add margin top for spacing */
+    margin-bottom: 10px; 
+}
+
+.my-history-container ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0; /* Reset default margin */
+    margin-bottom: 20px;
+}
+
+.my-history-container ul li {
+    background-color: #f5f5f5; /* Light color background for li */
+    border-bottom: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 10px; 
+}
+
+.my-history-container ul li:last-child {
+    border-bottom: none; /* Remove border for the last item */
+}
+
+.my-history-container ul li p {
+    margin: 5px 0;
+}
+
+.my-history-container ul li a {
+    color: #007bff; /* Link color */
+    text-decoration: none;
+}
+
+.my-history-container ul li a:hover {
+    text-decoration: underline;
+}
+
+</style>
+
+<body>
+    <div style="padding-top: 200px; padding-bottom:100px;">
+    <div class="my-history-container">
+    <h1>My History</h1>
+
+    <h2>My Services</h2>
     <ul>
         {% for service_booking in service_bookings %}
-            <li>{{ service_booking }}</li>
+            <li>
+               
+                Car: {{ service_booking.car }}<br>
+                Service Type: {{ service_booking.get_service_type_display }}<br>
+                Date: {{ service_booking.date }}<br>
+                Time: {{ service_booking.time }}<br>
+                Location: {{ service_booking.get_location_display }}<br>
+                Address: {{ service_booking.address }}<br>
+                Status: {{ service_booking.status }}<br>
+            </li>
+        {% empty %}
+            <li>No service bookings found.</li>
         {% endfor %}
     </ul>
 
-    <h2>Test Drives</h2>
+    <h2>My Test Drives</h2>
     <ul>
         {% for test_drive in test_drives %}
-            <li>{{ test_drive }}</li>
+            <li>
+                
+                Car: {{ test_drive.car }}<br>
+                Date: {{ test_drive.date }}<br>
+                Time: {{ test_drive.time }}<br>
+                Location: {{ test_drive.get_location_display }}<br>
+                Address: {{ test_drive.address }}<br>
+                Status: {{ test_drive.status }}<br>
+
+        </li>
+        
+        {% empty %}
+            <li>No test drives found.</li>
         {% endfor %}
     </ul>
 
-    <h2>Loan Applications</h2>
+    <h2>My Loan Applications</h2>
     <ul>
         {% for loan_application in loan_applications %}
-            <li>{{ loan_application }}</li>
+            <li>
+                
+                Selected Car: {{ loan_application.selected_car }}<br>
+                Message: {{ loan_application.message }}<br>
+                Status: {{ loan_application.get_status_display }}<br>
+                Created At: {{ loan_application.created_at }}<br>
+            </li>
+        {% empty %}
+            <li>No loan applications found.</li>
         {% endfor %}
     </ul>
+    <h2>My Token</h2>
+    <ul>
+        {% for reservation in reservations %}
+        <li>
+            Reservation Token ID: {{ reservation.token_id }}<br>
+            Car: {{ reservation.car }}<br>
+            Reservation Date: {{ reservation.reservation_date }}<br>
+            Expiration Date: {{ reservation.expiration_date }}<br>
+            Token Amount: {{ reservation.token_amount }}<br>
+            Order ID: {{ reservation.order_id }}<br>
+            Payment ID: {{ reservation.payment_id }}<br>
+            Status: {{ reservation.status }}<br>
+            <!-- Add more details as needed -->
+        </li>
+            
+        {% empty %}
+            <li>No reservations found.</li>
+        {% endfor %}
+    </ul>
+    <h2>My Orders</h2>
+    <ul>
+        {% for order in orders %}
+            <li>
+                Order ID: {{ order.order_id }}<br>
+                Car: {{ order.car }}<br>
+                Order Date: {{ order.order_date }}<br>
+                Delivery Date: {{ order.delivery_date }}<br>
+                Delivery Location: {{ order.delivery_location }}<br>
+                Price: {{ order.price }}<br>
+                Payment Status: {{ order.payment_status }}<br>
+                Order Status: {{ order.order_status }}<br>
+                Additional Information: {{ order.additional_information }}<br>
+                <!-- Add more details as needed -->
+            </li>
+        {% empty %}
+            <li>No orders found.</li>
+        {% endfor %}
+    </ul>
+</div>
+</div>
 </body>
-</html>
+
+{% endblock body %}

@@ -1,35 +1,49 @@
-{% extends "base.html" %} {% block title %} Book Test Drive{% endblock title %}
-{% block content %} {% load static %}
+{% extends "base.html" %} {% block title %} Book Service {% endblock title %}
+{% block content %}{% endblock content %}
+{% block body %}
+{% load static %}
+ 
+ <style>
+  nav.navbar.bootsnav {
+    background-color: #000  !important;   /* Change to your desired background color */
+    border-bottom: none  !important;   /* Remove bottom border if not needed */
+}
+
+/* Make the navbar sticky */
+  nav.navbar.bootsnav.navbar-sticky {
+    position: fixed  !important;
+    top: 0  !important;
+    width: 100%  !important;
+    z-index: 1000  !important; /* Adjust z-index as needed */
+}
+ </style>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-  }
-  .fixed-container {
-    position: relative;
-    z-index: 1;
-  }
+ 
+  
 
   .card {
-    width: 50%;
+    width: 80%; /* Adjust the width as needed */
     max-width: 400px;
-    margin: 200px auto 50px;
+    margin: auto;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: #fff;
     z-index: 1000;
-
-    position: relative;
+    position: fixed;
+    top: calc(50% + 100px); /* Fixed at 50% from the top */
+    left: 50%; /* Fixed at 50% from the left */
+    transform: translate(-50%, -50%);
+    overflow-y: auto;  
+    height: 60%; 
+    
   }
   h1 {
     text-align: center;
     color: #333;
   }
 
-  form {
+  .book-service-form {
     display: flex;
     flex-direction: column;
   }
@@ -72,7 +86,7 @@
     text-decoration: underline;
   }
 </style>
-
+<div class="fixed-container" style="padding-top:800px; padding-bottom: 100px;">
 <div class="card bg-light">
   <h2>Book Service</h2>
   <form
@@ -80,30 +94,42 @@
     action="{% url 'book_service' %}"
     class="book-service-form"
   >
-    {% csrf_token %} {% if car %}
+    {% csrf_token %}
+    <center>
+      <h1></h1>
+      {% if messages %}
+      {% for message in messages %}
+      {% if message.tags == "error" %}
+      <div class="alert alert-danger " role="alert">
+      {{message}}
+      </div>
+      {% else %}
+      <div class="alert alert-success" role="alert">
+          {{message}}
+      </div>
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+  </center>
+  {% if ordered_cars %}
     <!-- Pre-fill the car field if the car object is provided -->
     <input
       type="text"
       id="car"
       name="car"
-      value="{{ car.car_name }}"
-      {%
-      if
-      car.car_name
-      %}readonly{%
-      endif
-      %}
+      value="{{ ordered_cars.0.car_name }}"  {# Assuming ordered_cars is a list of car objects #}
+      {% if ordered_cars.0.car_name %}readonly{% endif %}
     />
-    {% else %}
+{% else %}
     <label for="car">Car:</label>
     <select id="car" name="car" required>
-      {% for car in available_cars %}
-      <option value="{{ car.id }}">{{ car.car_name }}</option>
-      {% endfor %}
+        {% for car in ordered_cars %}
+            <option value="{{ car.id }}">{{ car.car_name }}</option>
+        {% endfor %}
     </select>
-    {% endif %}
-    <label for="customer_name">Username:</label>
-    <input type="text" id="customer_name" name="customer_name" required />
+{% endif %}
+<label for="customer_name">Username:</label>
+<input type="text" id="customer_name" name="customer_name" value="{{ username }}" required />
 
     <label for="location">Location:</label>
     <select id="location" name="location" onchange="toggleAddressField()">
@@ -153,7 +179,7 @@
     <button type="submit" id="submitButton">Book service</button>
   </form>
 
-  
+</div>
 </div>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
@@ -337,4 +363,4 @@
     });
   }
 </script>
-{% endblock content %} {% block body %} {% endblock body %}
+ {% endblock body %}

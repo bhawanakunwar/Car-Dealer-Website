@@ -1,134 +1,218 @@
-
-
-{% block title %}{% endblock %}
-
-{% block content  %}
+{% extends "base.html" %}
+{% block title %}Book Now{% endblock title %}
+{% block content %}{% endblock content %}
+{% block body %}
 {% load static %}
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  margin: 0;
-  padding: 0;
+  nav.navbar.bootsnav {
+    background-color: #000  !important;   /* Change to your desired background color */
+    border-bottom: none  !important;   /* Remove bottom border if not needed */
 }
 
-h1, h2, h3, p {
-  margin: 10px 0;
+/* Make the navbar sticky */
+nav.navbar.bootsnav.navbar-sticky {
+    position: fixed  !important;
+    top: 0  !important;
+    width: 100%  !important;
+    z-index: 1000  !important; /* Adjust z-index as needed */
 }
+  
+</style>
+<style>
+ 
+  
+  
+  h1, h2, h3, p {
+    margin: 10px 0;
+  }
+  
+  /* Checkout container */
+  .checkout-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Financier slide */
+  .financier-slide {
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin: 10px;
+    max-width: 300px;
+    position: relative;
+    border-radius: 8px;
+  }
+  
+  .financier-slide .financier-logo {
+    width: 100%;
+    height: 200px; /* Adjust height as needed */
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 10px;
+    border-radius: 8px;
+  }
+  
+  .financier-slide .financier-info {
+    text-align: left;
+  }
+  
+  .financier-slide .financier-info h3 {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+    color: #333; /* Adjust color as needed */
+  }
+  
+  .financier-slide .financier-info p {
+    margin-bottom: 5px;
+    color: #666; /* Adjust color as needed */
+  }
+  
+  .financier-slide .contact-us-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    position: absolute;
+    margin-top:20px;
+    bottom: 1px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .financier-slide .contact-us-button:hover {
+    background-color: #45a049;
+  }
+  /* Close button */
 
-/* Checkout container */
-.checkout-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
 
-/* Financier slide */
-.financier-slide {
-  background-color: #fff;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  margin: 10px;
-  max-width: 300px;
-  position: relative;
-  border-radius: 8px;
-}
 
-.financier-slide .financier-logo {
-  width: 100%;
-  height: 200px; /* Adjust height as needed */
-  background-size: cover;
-  background-position: center;
-  margin-bottom: 10px;
-  border-radius: 8px;
-}
+  
+  /* Contact form overlay */
+  .contact-form-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .contact-form {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 50px auto; /* Center the form horizontally */
+    text-align: center;
+  }
+  
+  
+  .contact-form input,
+  .contact-form textarea {
+    width: calc(100% - 16px);
+    padding: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .contact-form button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .contact-form button:hover {
+    background-color: #45a049;
+  }
+  /* Close button */
 
-.financier-slide .financier-info {
-  text-align: left;
-}
-
-.financier-slide .financier-info h3 {
-  font-size: 1.2em;
-  margin-bottom: 5px;
-  color: #333; /* Adjust color as needed */
-}
-
-.financier-slide .financier-info p {
-  margin-bottom: 5px;
-  color: #666; /* Adjust color as needed */
-}
-
-.financier-slide .contact-us-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  position: absolute;
-  bottom: 1px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.financier-slide .contact-us-button:hover {
-  background-color: #45a049;
-}
 
 /* Contact form overlay */
 .contact-form-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
-  justify-content: center;
-  align-items: center;
+  /* Existing styles */
 }
 
 .contact-form {
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-  width: 100%;
+  /* Existing styles */
+}
+
+  /* Order Summary */
+  .order-summary {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px; /* Adjust max-width as needed */
+    margin: 0 auto; /* Center the container horizontally */
+  }
+  
+  .order-summary h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .order-summary .container {
+    width: 100%; /* Set the container width to 100% */
+    max-width: 1200px; /* Adjust max-width as needed */
+    margin: 0 auto;/* Center the content horizontally */
+  }
+  
+  .order-summary .row {
+    flex: 1; /* Allow the row to grow to fill the container */
+  }
+  
+.alert {
+  margin-bottom: 20px;
+}
+.payment-form {
   text-align: center;
 }
 
-.contact-form input,
-.contact-form textarea {
-  width: calc(100% - 16px);
-  padding: 8px;
-  margin-bottom: 10px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.contact-form button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
+/* Apply styles to the payment button */
+.payment-form button {
+  display: inline-block; /* Set display to inline-block */
+  padding: 10px 20px;
+  width: auto; 
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white; /* Change to your desired text color */
+  background-color:green; /* Set background color to transparent */
+  margin-top:15px;
+  border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.contact-form button:hover {
-  background-color: #45a049;
+.payment-form button:hover {
+  background-color: lightgrey; /* Change to your desired hover background color */
 }
 
-</style>
-<div class="checkout-container">
-  <h1>Car Dealer Checkout</h1>
+.payment-form button:active {
+  transform: translateY(1px);
+}
+
+  </style>
+  <div style="padding-top: 200px; padding-bottom: 50px;">
+<div class="checkout-container" >
 
   <!-- Financiers Carousel -->
-  <div id="financiers-carousel">
+  <div id="financiers-carousel"class="row">
     {% for financier in financiers %}
+    <div class="col-md-4">
     <div class="financier-slide">
       <div class="financier-logo" style="background-image: url('{{ financier.logo.url }}');"></div>
       <div class="financier-info">
@@ -136,28 +220,55 @@ h1, h2, h3, p {
         <p><strong>Email:</strong> {{ financier.email }}</p>
         <p><strong>Contact Number:</strong> {{ financier.contact_number }}</p>
         <p><strong>Website:</strong> <a href="{{ financier.website }}" target="_blank">{{ financier.website }}</a></p>
-        <button class="contact-us-button btn btn-primary" data-target="#contact-form-overlay" data-car-name="{{ selected_car.car_name }}" data-description="{{ selected_car.description }}">Contact Us</button>
+        <button class="contact-us-button btn btn-primary "data-target="#contact-form-overlay" data-car-name="{{ selected_car.car_name }}" data-description="{{ selected_car.description }}">Contact Us</button>
       </div>
     </div>
+  </div>
     {% endfor %}
   </div>
 </div>
 
 <div class="contact-form-overlay" id="contact-form-overlay">
   <div class="contact-form">
+    <span class="close-btn" onclick="closeContactForm()">&times;</span>
     <h2>Contact Us</h2>
     <form method="post" action="{% url 'contact_form_submission' %}">
-
-          <input type="text" name="name" placeholder="Your Username">
-          <input type="tel" name="phone" placeholder="Your Mobile Number"> 
+      {% csrf_token %}
+      <center>
         
-            <input type="email" name="email" placeholder="Your Email">
-            <label for="selected_car">Select a car:</label>
-            <select id="selected_car" name="selected_car">
-                {% for car in available_cars %}
-                 <option value="{{ car.id }}">{{ car.name }} - {{ car.model }}</option>
-                {% endfor %}
-            </select><br><br>
+        {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == "error" %}
+        <div class ="alert alert-danger" role="alert">
+        {{message}}
+        </div>
+        {% else %}
+        <div class="alert alert-success" role="alert">
+        {{message}}
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        </center>
+      <label for="customer_name">Username:</label>
+      <input type="text" id="customer_name" name="customer_name" value="{{ username }}" required />
+      
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" value="{{ email }}" required>
+      
+      <label for="mob_number">Phone Number:</label>
+      <input type="tel" id="mob_number" name="mob_number" value="{{ mob_number }}" required>
+
+      <label for="selected_car">Select a car:</label>
+      <select id="selected_car" name="selected_car">
+          {% if selected_car %}
+              <option value="{{ selected_car.id }}" selected>{{ selected_car.name }} - {{ selected_car.model }}</option>
+          {% else %}
+              <option value="" disabled selected>No car selected</option>
+          {% endif %}
+          <!-- Optionally, you can include other cars here -->
+      </select>
+            <br><br>
               <textarea name="message" placeholder="Your Message"></textarea>
               <button class="btn btn-info" type="submit">Submit</button>
         </form>
@@ -262,63 +373,116 @@ h1, h2, h3, p {
                 });
             });
         });
-    
+        function closeContactForm() {
+          var contactFormOverlay = document.querySelector('.contact-form-overlay');
+          contactFormOverlay.style.display = 'none'; // Hide the contact form overlay
+        }
+        
     
    
 </script>
 <div class="order-summary">
-  <h2>Order Summary</h2>
+  <h2>Summary</h2>
   {% if selected_car %}
-      <p><strong>Car Name:</strong> {{ selected_car.car_name }}</p>
-      <p><strong>Description:</strong> {{ selected_car.description }}</p>
-      <p><strong>Category:</strong> {{ selected_car.category }}</p>
-      <p><strong>Price:</strong> ${{ selected_car.price }}</p>
-      <p><strong>Make:</strong> {{ selected_car.make }}</p>
-      <p><strong>Model:</strong> {{ selected_car.model }}</p>
-      <p><strong>Year:</strong> {{ selected_car.year }}</p>
-      <p><strong>Transmission:</strong> {{ selected_car.transmission_type }}</p>
-      <!-- Add more details about the selected car as needed -->
+  <div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <img src="{{ selected_car.image.url }}" alt="{{ car.car_name }}" class="img-fluid">
+        </div>
+        <div class="col-md-6">
+            <h2 
+            style="font-weight: bold; color: #3498db;">{{ selected_car.car_name }}</h2>
+            <p>{{ selected_car.description }}</p>
+            <p>Category: {{ selected_car.category }}</p>
+            <p>Price: {{ selected_car.price }}</p>
+            <p>Make: {{ selected_car.make }}</p>
+            <p>Model: {{ selected_car.model }}</p>
+            <p>Year: {{ selected_car.year }}</p>
+            <p> Transmission:{{selected_car.transmission_type}}</p>
+            <!-- Add buttons for booking a test drive and purchasing -->
+        </div>
+      </div>
+    </div>
+    
   {% else %}
       <p>No car selected.</p>
   {% endif %}
 </div>
 
-
-
-  <!-- Additional Checkout Information -->
-
-    <!-- Shipping Information Form HTML -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <form id="paymentForm" action="{% url 'payment_success' %}" method="POST">
-      <!-- Add necessary input fields for payment details -->
-      <input type="hidden" name="amount" value="200000"> <!-- Amount in paisa (e.g., ₹10 would be 1000 paisa) -->
-      <input type="hidden" name="currency" value="INR"> <!-- Currency code -->
-      <input type="hidden" name="order_id" value="{{ order_id }}"> <!-- Unique order ID -->
-      <button type="button" id="rzp-button" >Pay Rs.2000</button>
-  </form>
+<div class="text-center mt-3">    
+    <form id="payment-form"class="payment-form" method="POST" action="{% url 'payment_success' %}">
+      {% csrf_token %}
+      <center>
+        
+        {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == "error" %}
+        <div class ="alert alert-danger" role="alert">
+        {{message}}
+        </div>
+        {% else %}
+        <div class="alert alert-success" role="alert">
+        {{message}}
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        </center>
+      <input type="hidden" name="car_id" value="{{ selected_car.id }}">
+      <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+      <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
   
+      <p id="refund_info" style="display: none; font-size: 16px; text-align: center;">Refundable</p>
+      <button type="button" id="rzp-button1" class="btn btn-outline-success btn-block">Pay Rs.2000</button>
+  </form>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script>
-    var options = {
-        "key": "{{ settings.RAZORPAY_API_KEY }}",
-        "amount": "{{ amount }}",
-        "currency": "INR",
-        "name": "Your Company Name",
-        "description": "Payment Description",
-        "order_id": "{{ order_id }}",
-        "handler": function(response) {
-            // Handle the payment success response
-            // You can submit the form or redirect to a success page
-            document.forms[0].submit();
-        },
-        "prefill": {
-            "name": "John Doe",
-            "email": "john@example.com",
-            "contact": "9876543210"
-        }
-    };
-    var rzp = new Razorpay(options);
-    rzp.open();
-</script>
+      document.addEventListener('DOMContentLoaded', function() {
+          // Razorpay options
+          var options = {
+              "key": "{{api_key}}",
+              "name": "CARZONE",
+              "description": "TOKEN PAYMENT",
+              "image": "https://example.com/your_logo",
+              "order_id": "{{order_id}}",
+              "handler": function(response) {
+                  // Update payment form fields with payment details
+                  document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                  document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+  
+                  // Submit the form programmatically
+                  paymentForm.submit();
+              },
+              // Other options...
+          };
+  
+          // Initialize Razorpay
+          var rzp1 = new Razorpay(options);
+  
+          // Get the payment form and button
+          const paymentForm = document.getElementById('payment-form');
+          const payButton = document.getElementById('rzp-button1');
+  
+          // Add click event listener to the pay button
+          payButton.addEventListener('click', function(event) {
+              // Prevent default form submission
+              event.preventDefault();
+  
+              // Open Razorpay payment box
+              rzp1.open();
+          });
+  
+          // Razorpay payment failed handler
+          rzp1.on('payment.failed', function(response) {
+              // Handle payment failure
+              alert('Payment failed: ' + response.error.description);
+          });
+      });
+  </script>
+  
+  </div>
+</div>
+</div>
 
 
   
@@ -367,7 +531,8 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
+{% endblock body %}
 
 
 
-{% endblock content %}
+

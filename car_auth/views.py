@@ -18,7 +18,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth import authenticate, login, logout
 from .tokens import generate_token
-
+import re
 
 
 User = get_user_model()#Create your views here.
@@ -32,73 +32,51 @@ def signup(request):
         password = request.POST.get('password')
         confirm_password=request.POST.get('confirm_password')
         
+       
+        if not (username and email and mob_number and password and confirm_password):
+            messages.error(request, "All fields must be filled out")
+            return render(request, 'authentication/signup.html')
+        
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match")
+            return render(request, 'authentication/signup.html')
+        
+        if not re.match(r'\S+@\S+\.\S+', email):
+            messages.error(request, "Invalid email address")
+            return render(request, 'authentication/signup.html')
+        
+        if not re.match(r'^[0-9]{10}$', mob_number):
+            messages.error(request, "Invalid phone number. Phone number must be 10 digits")
+            return render(request, 'authentication/signup.html')
+        
+        if len(password) < 8:
+            messages.error(request, "Password must be at least 8 characters long")
+            return render(request, 'authentication/signup.html')
+         
+       
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists! Please try a different email.")
+            return render(request, 'authentication/signup.html')
+        
         if User.objects.filter(username=username).exists():
-         messages.error(request, "Username already exists! Please try a different username.")
-         return render(request,'authentication/signup.html')
-        
-        
-        if password!=confirm_password:
-             return render(request, 'authentication/signup.html', {'error': 'Passwords do not match'})
-        try:
-            if User.objects.get(username=email):
-                 return render(request, 'authentication/signup.html', {'error': 'Username already exists'})
-        except Exception as identifier:
-            pass
-        
-           
-
-        # Create a new user
+            messages.error(request, "Username already exists! Please try a different username.")
+            return render(request, 'authentication/signup.html')
+        if User.objects.filter(mob_number=mob_number).exists():
+            messages.error(request, "Mobile number already exists! Please try a different number.")
+            return render(request, 'authentication/signup.html')
+    
         new_user = User.objects.create_user(username, email, password=password, mob_number=mob_number)
-        new_user.is_active=False
+        new_user.is_active=True
 
         new_user.save()
-        # Send welcome email
-        subject = "Welcome to Our Django User Registration System"
-        message = f"Hello {new_user.username}!\n\nThank you for registering on our website. Please confirm your email address to activate your account.\n\nRegards,\nThe Django Team"
-        from_email = settings.EMAIL_HOST_USER
-        to_list = [new_user.email]
-        send_mail(subject, message, from_email, to_list, fail_silently=True)
-# Send email confirmation link
-        current_site = get_current_site(request)
-        email_subject = "Confirm Your Email Address"
-        message2 = render_to_string('authentication/email_confirmation.html', {
-       'name': new_user.username,
-       'domain': current_site.domain,
-       'uid': urlsafe_base64_encode(force_bytes(new_user.pk)),
-        'token': generate_token.make_token(new_user)
- })
-        email = EmailMessage(
-        email_subject,
-        message2,
-        settings.EMAIL_HOST_USER,
-        [new_user.email],
-  )
-        send_mail(email_subject, message2, from_email, to_list, fail_silently=True)
-        messages.success(request, "Your account has been created successfully! Please check your email to confirm your email address and activate your account.")
-        return redirect('auth/login')
+        messages.success(request,'successfully Registered,Please Login')
+        return redirect('/auth/login')
+    
     return render(request, "authentication/signup.html")
 
            
     
-    return render(request,"authentication/signup.html")
-def activate(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        new_user = User.objects.get(pk=uid)
-    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
-      new_user = None
-
-    if new_user is not None and generate_token.check_token(new_user, token):
-     new_user.is_active = True
-     new_user.save()
-     login(request, new_user)
-     messages.success(request, "Your account has been activated!")
-     return redirect('signin')
-    else:
-     return render(request, 'activation_failed.html')
-
-# views.py
-
 
 def handlelogin(request):
     
@@ -107,9 +85,11 @@ def handlelogin(request):
         
         email=request.POST.get('email')
         password=request.POST.get('password')
-        print(f"Email: {email}")
-        print(f"Password: {password}")
-
+        
+        if not (email and password):
+            messages.error(request, "Email and password are required.")
+            return render(request, 'authentication/login.html')
+        
         user=authenticate(request,email=email,password=password)
 
         
@@ -117,13 +97,9 @@ def handlelogin(request):
 
         if user is not None:
             login(request,user)
-            if request.GET.get('next',None):
-                return HttpResponseRedirect(request.GET['next'])
-
-            messages.success(request,"Login Success")
-            return redirect("/")
+            return redirect("/index")
         else:
-            messages.error(request,"invalid credentials")
+            messages.error(request,"Email and password do not match ")
             return redirect('/auth/login')      
 
         

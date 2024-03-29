@@ -1,8 +1,58 @@
 <!-- my_account.html -->
 
+{% extends "base.html" %}
+{% block content %}{% endblock content %}
+{% block body %}
+{% load static %}
+<style>
+    nav.navbar.bootsnav {
+      background-color: #000  !important;   /* Change to your desired background color */
+      border-bottom: none  !important;   /* Remove bottom border if not needed */
+  }
+  
+  /* Make the navbar sticky */
+    nav.navbar.bootsnav.navbar-sticky {
+      position: fixed  !important;
+      top: 0  !important;
+      width: 100%  !important;
+      z-index: 1000  !important; /* Adjust z-index as needed */
+  }
+</style>
+<style>
+   
+    /* Style for the "My Account" section */
+.my-account-section {
+    padding-top: 170px;
+    padding-bottom: 300px;
+    text-align: center;
+}
 
-{% block content %}
+.my-account-section h2 {
+    font-size: 24px;
+    color: #333;
+}
+
+.my-account-section p {
+    margin-bottom: 20px;
+}
+
+.my-account-section a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.my-account-section a:hover {
+    background-color: #444;
+}
+
+   </style>
+   <div style="padding-top: 170px; padding-bottom: 300px;">
     <!-- Add your "My Account" content here -->
+    <div class="my-account-section">
     <h2>My Account</h2>
     <!-- Include the header snippet -->
     {% if user.is_authenticated %}
@@ -13,4 +63,6 @@
         <!-- Add other links or navigation as needed -->
     {% endif %}
     <!-- Add other content specific to "My Account" -->
-{% endblock %}
+   </div>
+</div>
+{% endblock body %}

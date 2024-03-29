@@ -2,23 +2,39 @@
 {% block title %}Home{% endblock title %}
 
 {% block content %}
+{% load static %}
 <style>
     .car-container {
         margin-top: 150px; /* Adjust the margin-top value as needed */
     }
+    .card {
+      height: 100%;
+  }
+  .card-img-top {
+    width: 100%;
+    height: 200px; /* Adjust the height of the image as needed */
+    object-fit: cover;
+}
+
+
+
+
 </style>
+
+
+<div class="background-container">
 <div class="welcome-hero-txt">
-  <h2>Discover a Fusion of Style and Performance</h2>
+  <h2>Experience the Future of Driving</h2>
   <p>
-    Your journey is our passion. Come, Explore, and let us redefine the way you experience driving. Your dream car and exceptional service await you. Ready to hit the road? Visit CARZONE today!
-  </p>
-  <button class="welcome-btn" onclick="window.location.href='#'">
-    Book Car
+     Explore Our Brand-New Dealership Today!</p>
+  <button class="welcome-btn" onclick="window.location.href='/cars'">
+    Explore
   </button>
-</div>   
+</div>  
+</div> 
 {% endblock content %}
 {% block body %}
-{% load static %}
+
 <script>
 
   function toggleWishlist(element) {
@@ -69,14 +85,20 @@
   
 
 <div class="container mt-4 car-container">
+  
     <div class="row">
         {% for car in featured_cars %}
+        
             <div class="col-md-3 mt-3">
+              <div class="card">
                 <img src='/media/{{ car.image }}' class="card-img-top" alt="...">
                 <div class="card-body">
-                    <h5 class="card-title">{{ car.car_name }}</h5>
-                    <p class="card-text">{{ car.desc|slice:"0:53" }}...</p>
-                    <h6 class="card-title">Price: {{ car.price }}</h6>
+                    <h5 class="card-title"style="font-weight: bold; color: #3498db;">{{ car.car_name }}</h5>
+                    
+                    <h6 class="card-title" style="font-size: 18px; font-family: Arial, sans-serif; margin-top:5px;">Rs. {{ car.price }}</h6>
+                    <h6 class="card-title"style="font-size: 18px; font-family: Arial, sans-serif;margin-top:5px; margin-bottom:5px;"> {{ car.transmission_type }}</h6>
+                    
+
                     <!-- Add buttons or links for actions like Book Test Drive, Buy Now, View Details -->
                     <span id="divpr{{ i.id }}" class="divpr">
                       {% if i.id in wishlist_car_ids %}
@@ -92,7 +114,8 @@
                 </div>
     
            </div>
-          
+          </div>
+        
           
           {% endfor %}
     
@@ -118,8 +141,7 @@
                     <a href="#">largest dealership <span> of</span> car</a>
                   </h2>
                   <p>
-                    Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
-                    odit aut den fugit sed quia.
+                    the largest car dealership in town! Explore an expansive showroom featuring an unparalleled selection of top-notch vehicles. Your dream ride awaits, with unmatched variety and quality under one roof!
                   </p>
                 </div>
               </div>
@@ -128,10 +150,9 @@
                   <div class="single-service-icon">
                     <i class="flaticon-car-repair"></i>
                   </div>
-                  <h2><a href="#">12 month warranty</a></h2>
+                  <h2><a href="#">Service</a></h2>
                   <p>
-                    Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
-                    odit aut den fugit sed quia.
+                    Experience top-tier service beyond the sale with our comprehensive range of automotive solutions. From maintenance to repairs, trust our expert team to keep your vehicle running smoothly for miles to come!
                   </p>
                 </div>
               </div>
@@ -140,10 +161,17 @@
                   <div class="single-service-icon">
                     <i class="flaticon-car-1"></i>
                   </div>
-                  <h2><a href="#">finance support</a></h2>
+                  <h2><a href="#"> Finance</a></h2>
                   <p>
-                    Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
-                    odit aut den fugit sed quia.
+                    Unlock flexible financing options tailored to your needs through our trusted third-party partners.
+                    Let us guide you through the seamless process towards owning your dream car!
+
+
+
+
+
+
+
                   </p>
                 </div>
               </div>
@@ -164,26 +192,19 @@
                 <div class="single-testimonial-box">
                   <div class="testimonial-description">
                     <div class="testimonial-info">
-                      <div class="testimonial-img">
-                        <img
-                          src="/static/assets/images/clients/c1.png"
-                          alt="image of clients person"
-                        />
-                      </div>
+                      
                       <!--/.testimonial-img-->
                     </div>
                     <!--/.testimonial-info-->
                     <div class="testimonial-comment">
                       <p>
-                        Sed ut pers unde omnis iste natus error sit voluptatem
-                        accusantium dolor laudan rem aperiam, eaque ipsa quae ab
-                        illo inventore verit.
+                        "Booking a test drive through the dealership was incredibly convenient. The staff were friendly and accommodating, and I got to experience the car firsthand before making my decision. It made the whole process smooth and hassle-free."
                       </p>
                     </div>
                     <!--/.testimonial-comment-->
                     <div class="testimonial-person">
-                      <h2><a href="#">tomas lili</a></h2>
-                      <h4>new york</h4>
+                      <h2><a href="#">Rohan Gupta</a></h2>
+                      <h4>Vadodra</h4>
                     </div>
                     <!--/.testimonial-person-->
                   </div>
@@ -196,26 +217,19 @@
                 <div class="single-testimonial-box">
                   <div class="testimonial-description">
                     <div class="testimonial-info">
-                      <div class="testimonial-img">
-                        <img
-                          src="/static/assets/images/clients/c2.png"
-                          alt="image of clients person"
-                        />
-                      </div>
+                     
                       <!--/.testimonial-img-->
                     </div>
                     <!--/.testimonial-info-->
                     <div class="testimonial-comment">
                       <p>
-                        Sed ut pers unde omnis iste natus error sit voluptatem
-                        accusantium dolor laudan rem aperiam, eaque ipsa quae ab
-                        illo inventore verit.
+                        "Securing financing through their third-party partners was a game-changer for me. The options presented were tailored to my needs, and the rates were competitive. I felt supported every step of the way, making buying my dream car a reality."
                       </p>
                     </div>
                     <!--/.testimonial-comment-->
                     <div class="testimonial-person">
-                      <h2><a href="#">romi rain</a></h2>
-                      <h4>london</h4>
+                      <h2><a href="#">Priya Patel</a></h2>
+                      <h4>Ahmedabad</h4>
                     </div>
                     <!--/.testimonial-person-->
                   </div>
@@ -228,26 +242,18 @@
                 <div class="single-testimonial-box">
                   <div class="testimonial-description">
                     <div class="testimonial-info">
-                      <div class="testimonial-img">
-                        <img
-                          src="/static/assets/images/clients/c3.png"
-                          alt="image of clients person"
-                        />
-                      </div>
+                      
                       <!--/.testimonial-img-->
                     </div>
                     <!--/.testimonial-info-->
                     <div class="testimonial-comment">
-                      <p>
-                        Sed ut pers unde omnis iste natus error sit voluptatem
-                        accusantium dolor laudan rem aperiam, eaque ipsa quae ab
-                        illo inventore verit.
+                      <p>"From booking my test drive to finalizing the financing, the dealership provided exceptional service throughout. They made the entire process seamless and enjoyable. I'm thrilled with my new car and grateful for the support I received from start to finish."
                       </p>
                     </div>
                     <!--/.testimonial-comment-->
                     <div class="testimonial-person">
-                      <h2><a href="#">john doe</a></h2>
-                      <h4>washington</h4>
+                      <h2><a href="#">Nirmal Desai</a></h2>
+                      <h4>Surat</h4>
                     </div>
                     <!--/.testimonial-person-->
                   </div>

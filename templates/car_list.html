@@ -1,23 +1,55 @@
 {% extends "base.html" %}
-{% block title %}Car List{% endblock title %}
-
-{% block content %}
+{% block content %}{% endblock content %}
+ {% block body %}
+ {% load static %}
+ <style>
+    nav.navbar.bootsnav {
+        background-color: #000; /* Change to your desired background color */
+        border-bottom: none; /* Remove bottom border if not needed */
+    }
+    
+    /* Make the navbar sticky */
+    nav.navbar.bootsnav.navbar-sticky {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000; /* Adjust z-index as needed */
+    }
+</style>
+<style>
+    .car-container {
+        margin-top: 150px; /* Adjust the margin-top value as needed */
+    }
+    .card {
+      height: 100%;
+  }
+  .card-img-top {
+    width: 100%;
+    height: 200px; /* Adjust the height of the image as needed */
+    object-fit: cover;
+}
+</style>
+<div style="padding-top: 30px; padding-bottom: 50px;">
 <div class="container mt-4 car-container">
     <div class="row">
         {% for car, range, nSlides in allCars  %}
-            <h3 class="my-3 text-center text-success bg-light">{{ car.0.category }} Flashsale</h3>
+            <h3 class="my-3 text-center text-success bg-light" style="font-size: 30px; color:black;margin-bottom:40px;margin-top:45px;">{{ car.0.category }} </h3>
 
             <div class="container mt-3">
                 <div class="row">
                     {% for i in car %}
                         <div class="col-md-3 mt-3">
+                            <div class="card">
                             <img src='/media/{{ i.image }}' class="card-img-top" alt="...">
                             <div class="card-body">
-                                <h5 class="card-title" id="namepr{{ i.id }}">{{ i.car_name }}</h5>
-                                <p class="card-text">{{ i.description|slice:"0:53" }}...</p>
-                                <h6 class="card-title">
-                                    Price: <span id="pricepr{{ i.id }}">{{ i.price }}</span>
+                                <h5 class="card-title"style="font-weight: bold; color: #3498db;" id="namepr{{ i.id }}">{{ i.car_name }}</h5>
+                               
+                                <h6 class="card-title"style="font-size: 18px; font-family: Arial, sans-serif; margin-top:5px;
+                                ">
+                                     <span id="pricepr{{ i.id }}">Rs.{{ i.price }}</span>
                                 </h6>
+                                <h6 class="card-title" style="font-size: 18px; font-family: Arial, sans-serif; 
+                                margin-top:5px; margin-bottom:5px;"> {{ i.transmission_type }}</h6>
                                 <span id="divpr{{ i.id }}" class="divpr">
                                     {% if i.id in wishlist_car_ids %}
                                         <button class="btn btn-success cart btn-sm mt-0" disabled>Added to Wishlist</button>
@@ -28,15 +60,17 @@
                                 </span>
                             </div>
                         </div>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
         {% endfor %}
     </div>
 </div>
-{% endblock content %}
+</div>
 
-{% block body %}
+
+
 <script>
     function toggleWishlist(element) {
         var carId = element.getAttribute('data-carid');
@@ -83,4 +117,5 @@
         });
     }
 </script>
-{% endblock body %}
+
+{% endblock body%}

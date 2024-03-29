@@ -1,41 +1,55 @@
 {% extends "base.html" %}
-{% block title %}Login{% endblock title %}
-{% block content %}
+{% block title %}{% endblock title %}
+{% block body %}
+{% load static %}
+<style>
+    nav.navbar.bootsnav {
+      background-color: #000  !important;   /* Change to your desired background color */
+      border-bottom: none  !important;   /* Remove bottom border if not needed */
+  }
+  
+  /* Make the navbar sticky */
+    nav.navbar.bootsnav.navbar-sticky {
+      position: fixed  !important;
+      top: 0  !important;
+      width: 100%  !important;
+      z-index: 1000  !important; /* Adjust z-index as needed */
+  }
+   </style>
+
     <style>
-       
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 0;
-    }
-    .fixed-container {
-        position: relative;
-        z-index: 1;
-    }
+        
+  
     
-    .card {
-        width: 50%;
-        max-width: 400px;
-        margin: 200px auto 50px;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        background-color: #fff;
-        z-index:1000;
+    
+        .card {
+            width: 50%;
+            max-width: 400px;
+            margin: 200px auto 50px; 
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            z-index:1000;
+            position: fixed; /* Make the container fixed */
+            top: 10px; /* Adjust the top position as needed */
+            left: 50%; /* Center the container horizontally */
+            transform: translateX(-50%);
+            
+            
+            
+        }
         
-        position: relative;
-        
-    }
     h1 {
         text-align: center;
         color: #333;
     }
-    
-    form {
+    .login-form {
         display: flex;
         flex-direction: column;
-    }
+      }
+    
+    
     
     label {
         margin-top: 10px;
@@ -62,6 +76,9 @@
         border-radius: 5px;
         cursor: pointer;
     }
+    button:hover {
+        background-color: #444; /* Darken the background color slightly */
+    }
     
     a {
         text-decoration: none;
@@ -73,14 +90,32 @@
     
     a:hover {
         text-decoration: underline;
+        
     }
     </style>
+    <div style="padding-top: 200px; padding-bottom: 500px;">
 
     <div class="card">
         <h1>Login</h1>
 
-        <form action="{% url 'car_auth:handlelogin' %}" method="post" onsubmit="return validateForm()">
+        <form action="{% url 'car_auth:handlelogin' %}" class="login-form" method="post" onsubmit="return validateForm()">
             {% csrf_token %}
+            <center>
+                <h1></h1>
+                {% if messages %}
+                {% for message in messages %}
+                {% if message.tags == "error" %}
+                <div class="alert alert-danger " role="alert">
+                {{message}}
+                </div>
+                {% else %}
+                <div class="alert alert-success" role="alert">
+                    {{message}}
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+            </center>
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
 
@@ -94,20 +129,8 @@
             <br>
             New User? <a href="/auth/signup/">Signup</a>
         </form>
-
-        <script>
-            function validateForm() {
-                var email = document.getElementById("email").value;
-                var password = document.getElementById("password").value;
-
-                if (email === "" || password === "") {
-                    document.getElementById("error-message").innerHTML = "Email and password are required.";
-                    return false;
-                } else {
-                    document.getElementById("error-message").innerHTML = "";
-                    return true;
-                }
-            }
-        </script>
     </div>
-{% endblock content %}
+
+        
+    </div>
+    {% endblock body %}
