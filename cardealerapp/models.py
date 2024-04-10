@@ -60,12 +60,13 @@ class ServiceBooking(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('Completed', 'Completed'),
+        ('In Progress', 'In Progress'),
     ]
     customer_name = models.CharField(max_length=100)
     car = models.ForeignKey(Car, on_delete=models.CASCADE)
     service_type = models.CharField(max_length=20, choices=SERVICE_TYPE_CHOICES)
     date = models.DateField()
-    time = models.CharField(max_length=100) 
+    time = models. TimeField()
     location = models.CharField(max_length=10, choices=LOCATION_CHOICES, default='carzone')
     address = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
@@ -73,14 +74,7 @@ class ServiceBooking(models.Model):
     comments = models.TextField(blank=True, null=True)
 
 
-    def save(self, *args, **kwargs):
-        current_datetime = timezone.now()
-        if self.date < current_datetime.date() or (self.date == current_datetime.date() and self.time < current_datetime.time()):
-            self.status = "Completed"
-        elif self.date == current_datetime.date() and self.time == current_datetime.time():
-            self.status = "Pending"
-        super().save(*args, **kwargs)
-        
+   
 
     def __str__(self):
         return f"Service Booking for {self.car} at {self.location} on {self.date} from {self.time}"
@@ -94,25 +88,19 @@ class TestDrive(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('Completed', 'Completed'),
+        ('Cancelled','Cancelled'),
     ]
     customer_name = models.CharField(max_length=100)  
     car = models.ForeignKey(Car, on_delete=models.CASCADE)
     date = models.DateField()
-    time = models.CharField(max_length=100) 
+    time = models.TimeField(max_length=20)
     location = models.CharField(max_length=10, choices=LOCATION_CHOICES, default='carzone')
     address = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
 
     
-    def save(self, *args, **kwargs):
-        current_datetime = timezone.now()
-        if self.date < current_datetime.date() or (self.date == current_datetime.date() and self.time < current_datetime.time()):
-            self.status = "Completed"
-        elif self.date == current_datetime.date() and self.time == current_datetime.time():
-            self.status = "Pending"
-        super().save(*args, **kwargs)
-
+   
     def __str__(self):
         return f"Test Drive of {self.car} at {self.location} on {self.date} from {self.time}"
 
@@ -195,17 +183,18 @@ class Reservation(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Valid')
     
     def save(self, *args, **kwargs):
-        current_date = timezone.now().date()
-        if self.expiration_date < current_date:
+        current_datetime = timezone.now()
+        if self.expiration_date < current_datetime:
             self.status = "Expired"
         else:
             self.status = "Valid"
         super().save(*args, **kwargs)
-
     
     def __str__(self):
         return f"Reservation #{self.id} for {self.user.username}"
-import uuid
+
+import random
+import string
 class Order(models.Model):
     PAYMENT_STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -223,19 +212,23 @@ class Order(models.Model):
     order_date = models.DateTimeField()
     delivery_date = models.DateTimeField()
     delivery_location = models.CharField(max_length=255)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.CharField(max_length=100, default="")
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='Pending')
     order_status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='Processing')
     additional_information = models.TextField(blank=True)
     reservation = models.OneToOneField(Reservation, on_delete=models.SET_NULL, null=True, blank=True)
 
+    
     def save(self, *args, **kwargs):
+        if not self.pk:  # Only generate a new order ID if it's a new order
+            # Generate order ID
+            random_id = ''.join(random.choices(string.digits, k=6))  # Generate a random 6-digit ID
+            self.order_id = f"#{random_id}"
+
         # Set delivery_date to 7 days after order_date if not set
         if not self.delivery_date:
             self.delivery_date = self.order_date + timezone.timedelta(days=7)
-        # Generate order_id if not provided
-        if not self.order_id:
-            self.order_id = uuid.uuid4().hex
+
         super().save(*args, **kwargs)
 
     def __str__(self):

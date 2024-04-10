@@ -18,8 +18,46 @@
         width: 100%;
         z-index: 1000; /* Adjust z-index as needed */
     }
+    .navbar form {
+        
+        position: relative; 
+        display: flex; /* Use flexbox for layout */
+        align-items: center; /* Align items vertically */
+    }
+    .navbar form input[type="text"] {
+        /* Add specific styles for the search input in the navbar */
+        padding: 8px; /* Adjust padding */
+        margin-right: 5px; /* Adjust margin */
+        border: 1px solid #ccc; /* Border color */
+        border-radius: 3px; /* Rounded corners */
+        width: 350px; 
+    }
+    
+    .navbar form button[type="submit"] {
+        /* Add specific styles for the search button in the navbar */
+        position:absolute;
+        right: 400px;
+        top: 2px; 
+        background-color: #007bff; /* Button background color */
+        color: #fff; /* Button text color */
+        border: none; /* Remove button border */
+        border-radius: 3px; /* Rounded corners */
+        padding: 8px 15px; /* Padding inside button */
+        cursor: pointer; /* Change cursor to pointer on hover */
+        
+    }
+    
+    .navbar form button[type="submit"]:hover {
+        background-color: #0056b3; /* Button background color on hover */
+    }
 </style>
 <style>
+    .body{
+        background-image:url("/static/assets/images/bg_image/car3.jpg");
+        background-size: cover; /* Cover the entire background */
+        background-position: center; /* Center the background image */
+        background-repeat: no-repeat; /* Do not repeat the background image */
+      }
     /* Style for the "My History" page */
 .my-history-container {
     padding-top: 30px;
@@ -55,6 +93,7 @@
 
 .my-history-container ul li {
     background-color: #f5f5f5; /* Light color background for li */
+    display: flex; 
     border-bottom: 1px solid #ccc;
     padding: 20px;
     margin-bottom: 10px; 
@@ -76,7 +115,84 @@
 .my-history-container ul li a:hover {
     text-decoration: underline;
 }
+.my-history-container ul li .image {
+    margin-right: 20px; /* Add spacing between image and details */
+    flex-shrink: 0;
+}
 
+.my-history-container ul li .image img {
+    width: 150px; /* Adjust image width as needed */
+    height: auto;
+}
+
+.my-history-container ul li .details {
+    display: flex; /* Display details in a row */
+    flex-grow: 1; /* Allow the details to grow and take remaining space */
+    align-items: center; /* Align items vertically */
+}
+
+/* Optional: Add styles for responsiveness */
+@media (max-width: 768px) {
+    .my-history-container ul li {
+        flex-direction: column; /* Stack items vertically on smaller screens */
+    }
+
+    .my-history-container ul li .image {
+        margin-right: 0; /* Remove margin for image on smaller screens */
+        margin-bottom: 10px; /* Add spacing between image and details on smaller screens */
+    }
+}
+.cancel-button {
+    margin-top: 100px;
+    background-color: green; /* Red color for the button background */
+    color: #fff; /* White color for the button text */
+    border: none; /* Remove button border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 8px 16px; /* Padding inside the button */
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+.cancel-button:hover {
+    background-color: #c82333; /* Darker red color on hover */
+}
+.cancelled-button {
+    margin-top: 100px;
+    background-color: #ff6666; /* Red background */
+    color: #fff; /* White text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 20px; /* Padding */
+    font-size: 16px; /* Font size */
+    cursor: not-allowed; /* Change cursor to not-allowed */
+}
+
+.cancelled-button:hover {
+    background-color: #ff9999; /* Lighter red on hover */
+}
+.completed-button {
+    margin-top:100px;
+    background-color: orange; /* Green background color */
+    color: #fff; /* White text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 20px; /* Padding */
+    font-size: 16px; /* Font size */
+    cursor: not-allowed; /* Change cursor to not-allowed */
+}
+.progress-button {
+    margin-top:100px;
+    background-color:  blue; /* Green background color */
+    color: #fff; /* White text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 20px; /* Padding */
+    font-size: 16px; /* Font size */
+    cursor: not-allowed; /* Change cursor to not-allowed */
+}
+
+.completed-button:hover {
+    background-color: #218838; /* Darker green on hover */
+}
 </style>
 
 <body>
@@ -87,8 +203,15 @@
     <h2>My Services</h2>
     <ul>
         {% for service_booking in service_bookings %}
-            <li>
-               
+            <li class="item">
+                <div class="image">
+                {% if service_booking.car.image %}
+                <img src="{{ service_booking.car.image.url }}" alt="{{ service_booking.car.name }} Image">
+            {% else %}
+                No Image Available
+            {% endif %}
+            </div>
+               <div class= "details">
                 Car: {{ service_booking.car }}<br>
                 Service Type: {{ service_booking.get_service_type_display }}<br>
                 Date: {{ service_booking.date }}<br>
@@ -96,6 +219,19 @@
                 Location: {{ service_booking.get_location_display }}<br>
                 Address: {{ service_booking.address }}<br>
                 Status: {{ service_booking.status }}<br>
+                {% if service_booking.status == "In Progress" %}
+                 <button type="button" class="progress-button">In Progress</button>
+                {% elif service_booking.status == "Completed" %}
+                 <button type="button" class="completed-button">Service Completed</button>
+                {% elif service_booking.status == "Cancelled" %}
+                 <label class="cancelled-button">Service Cancelled</label>
+                {% else %}
+                 <form method="POST" action="{% url 'cancel_service_booking' service_booking.id %}" method="post">
+                 {% csrf_token %}
+                  <button class="cancel-button" type="submit">Cancel Booking</button>
+                  </form>
+                 {% endif %}
+        </div>
             </li>
         {% empty %}
             <li>No service bookings found.</li>
@@ -105,15 +241,32 @@
     <h2>My Test Drives</h2>
     <ul>
         {% for test_drive in test_drives %}
-            <li>
-                
+            <li class="item">
+                <div class="image">
+                {% if test_drive.car.image %}
+                <img src="{{ test_drive.car.image.url }}" alt="{{ test_drive.car.name }} Image">
+            {% else %}
+                No Image Available
+            {% endif %}
+                </div>
+                <div class="details">
                 Car: {{ test_drive.car }}<br>
                 Date: {{ test_drive.date }}<br>
                 Time: {{ test_drive.time }}<br>
                 Location: {{ test_drive.get_location_display }}<br>
                 Address: {{ test_drive.address }}<br>
                 Status: {{ test_drive.status }}<br>
-
+                {% if test_drive.status == "Completed" %}
+                <button type="completed-button" class="completed-button">Test Drive Completed</button>
+                {% elif test_drive.status == "Cancelled" %}
+                <label class="cancelled-button">Test Drive Cancelled</label>
+            {% else %}
+                <form method="POST" action="{% url 'cancel_test_drive' test_drive.id %}" method="post">
+                    {% csrf_token %}
+                    <button class="cancel-button" type="submit">Cancel Booking</button>
+                </form>
+            {% endif %}
+        </div>
         </li>
         
         {% empty %}
@@ -124,12 +277,21 @@
     <h2>My Loan Applications</h2>
     <ul>
         {% for loan_application in loan_applications %}
-            <li>
+            <li class="item">
+                <div class="image">
+                {% if loan_application.selected_car.image %}
+                <img src="{{ loan_application.selected_car.image.url }}" alt="{{ loan_application.selected_car.name }} Image">
+            {% else %}
+                No Image Available
+            {% endif %}
+                </div>
+                <div class="details">
                 
                 Selected Car: {{ loan_application.selected_car }}<br>
                 Message: {{ loan_application.message }}<br>
                 Status: {{ loan_application.get_status_display }}<br>
                 Created At: {{ loan_application.created_at }}<br>
+                </div>
             </li>
         {% empty %}
             <li>No loan applications found.</li>
@@ -138,7 +300,15 @@
     <h2>My Token</h2>
     <ul>
         {% for reservation in reservations %}
-        <li>
+        <li class="item">
+            <div class="image">
+            {% if reservation.car.image %}
+            <img src="{{ reservation.car.image.url }}" alt="{{ reservation.car.name }} Image">
+        {% else %}
+            No Image Available
+        {% endif %}
+            </div>
+            <div class="details">
             Reservation Token ID: {{ reservation.token_id }}<br>
             Car: {{ reservation.car }}<br>
             Reservation Date: {{ reservation.reservation_date }}<br>
@@ -148,6 +318,7 @@
             Payment ID: {{ reservation.payment_id }}<br>
             Status: {{ reservation.status }}<br>
             <!-- Add more details as needed -->
+            </div>
         </li>
             
         {% empty %}
@@ -157,9 +328,19 @@
     <h2>My Orders</h2>
     <ul>
         {% for order in orders %}
-            <li>
+            <li class="item">
+                <div class="image">
+                {% if order.car.image %}
+                <img src="{{ order.car.image.url }}" alt="{{ order.car.name }} Image">
+            {% else %}
+                No Image Available
+            {% endif %}
+                </div>
+                <div class="details">
                 Order ID: {{ order.order_id }}<br>
                 Car: {{ order.car }}<br>
+                Reservation ID: {{ order.reservation.token_id }}<br>
+                Reservation Date: {{ order.reservation.reservation_date }}<br>
                 Order Date: {{ order.order_date }}<br>
                 Delivery Date: {{ order.delivery_date }}<br>
                 Delivery Location: {{ order.delivery_location }}<br>
@@ -168,6 +349,7 @@
                 Order Status: {{ order.order_status }}<br>
                 Additional Information: {{ order.additional_information }}<br>
                 <!-- Add more details as needed -->
+                </div>
             </li>
         {% empty %}
             <li>No orders found.</li>
@@ -175,6 +357,7 @@
     </ul>
 </div>
 </div>
+
 </body>
 
 {% endblock body %}

@@ -17,39 +17,96 @@
       width: 100%  !important;
       z-index: 1000  !important; /* Adjust z-index as needed */
   }
+  .navbar form {
+        
+    position: relative; 
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Align items vertically */
+}
+.navbar form input[type="text"] {
+    /* Add specific styles for the search input in the navbar */
+    padding: 8px; /* Adjust padding */
+    margin-right: 5px; /* Adjust margin */
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 3px; /* Rounded corners */
+    width: 350px; 
+}
+
+.navbar form button[type="submit"] {
+    /* Add specific styles for the search button in the navbar */
+    position:absolute;
+    right: 400px;
+    top: 2px; 
+    background-color: #007bff; /* Button background color */
+    color: #fff; /* Button text color */
+    border: none; /* Remove button border */
+    border-radius: 3px; /* Rounded corners */
+    padding: 8px 15px; /* Padding inside button */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    
+}
+
+.navbar form button[type="submit"]:hover {
+    background-color: #0056b3; /* Button background color on hover */
+}
 </style>
 <style>
+    .body{
+        background-image:url("/static/assets/images/bg_image/car4.jpg");
+        background-size: cover; /* Cover the entire background */
+        background-position: center; /* Center the background image */
+        background-repeat: no-repeat; /* Do not repeat the background image */
+      }
    
-    /* Style for the "My Account" section */
-.my-account-section {
-    padding-top: 170px;
-    padding-bottom: 300px;
-    text-align: center;
-}
+    .my-account-section {
+        padding-top: 170px;
+        padding-bottom: 300px;
+        text-align: center;
+    }
 
-.my-account-section h2 {
-    font-size: 24px;
-    color: #333;
-}
+    .my-account-section h2 {
+        font-size: 28px;
+        color: #333;
+        margin-bottom: 20px;
+    }
 
-.my-account-section p {
-    margin-bottom: 20px;
-}
+    .my-account-section p {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 20px;
+    }
 
-.my-account-section a {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #333;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-}
+    .my-account-section .username {
+        font-size: 24px;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 15px;
+    }
 
-.my-account-section a:hover {
-    background-color: #444;
-}
+    .my-account-section .actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
 
+    .my-account-section a {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 18px;
+        margin-bottom: 10px;
+        transition: background-color 0.3s ease;
+    }
+
+    .my-account-section a:hover {
+        background-color: #0056b3;
+    }
    </style>
+   <body>
    <div style="padding-top: 170px; padding-bottom: 300px;">
     <!-- Add your "My Account" content here -->
     <div class="my-account-section">
@@ -57,6 +114,8 @@
     <!-- Include the header snippet -->
     {% if user.is_authenticated %}
         <p>Welcome, {{ user.username }}!</p>
+        <a href="{% url 'car_auth:edit_profile' %}">Edit Profile</a><br>
+        <a href="{% url 'car_auth:change_password' %}">Change Password</a><br>
         <a href="{% url 'car_auth:handlelogout' %}">Logout</a>
     {% else %}
         <a href="{% url 'car_auth:handlelogin' %}">Login</a>
@@ -65,4 +124,5 @@
     <!-- Add other content specific to "My Account" -->
    </div>
 </div>
+</body>
 {% endblock body %}

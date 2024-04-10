@@ -1,0 +1,139 @@
+<!-- edit_profile.html -->
+
+{% extends "base.html" %}
+{% block title %}{% endblock title %}
+{% block content %}{% endblock content %}
+{% block body %}
+{% load static %}
+<style>
+    nav.navbar.bootsnav {
+        background-color: #000  !important;   /* Change to your desired background color */
+        border-bottom: none  !important;   /* Remove bottom border if not needed */
+    }
+    
+    /* Make the navbar sticky */
+    nav.navbar.bootsnav.navbar-sticky {
+        position: fixed  !important;
+        top: 0  !important;
+        width: 100%  !important;
+        z-index: 1000  !important; /* Adjust z-index as needed */
+    }
+    .navbar form {
+        
+        position: relative; 
+        display: flex; /* Use flexbox for layout */
+        align-items: center; /* Align items vertically */
+    }
+    .navbar form input[type="text"] {
+        /* Add specific styles for the search input in the navbar */
+        padding: 8px; /* Adjust padding */
+        margin-right: 5px; /* Adjust margin */
+        border: 1px solid #ccc; /* Border color */
+        border-radius: 3px; /* Rounded corners */
+        width: 350px; 
+    }
+    
+    .navbar form button[type="submit"] {
+        /* Add specific styles for the search button in the navbar */
+        position:absolute;
+        right: 400px;
+        top: 2px; 
+        background-color: #007bff; /* Button background color */
+        color: #fff; /* Button text color */
+        border: none; /* Remove button border */
+        border-radius: 3px; /* Rounded corners */
+        padding: 8px 15px; /* Padding inside button */
+        cursor: pointer; /* Change cursor to pointer on hover */
+        
+    }
+    
+    .navbar form button[type="submit"]:hover {
+        background-color: #0056b3; /* Button background color on hover */
+    }
+   
+</style>
+<style>
+    .body{
+        background-image:url("/static/assets/images/bg_image/car7.jpg");
+        background-size: cover; /* Cover the entire background */
+        background-position: center; /* Center the background image */
+        background-repeat: no-repeat; /* Do not repeat the background image */
+      }
+
+   
+
+    h2 {
+        color: #333; /* Heading color */
+        margin-bottom: 20px; /* Bottom margin */
+        text-align: center; /* Center align heading */
+        font-size:30px;
+    }
+
+    label {
+        display: block; /* Display labels as block elements */
+        margin-bottom: 10px; /* Bottom margin for labels */
+        color: #555; /* Label text color */
+    }
+    
+
+    input[type="email"],
+    input[type="text"] {
+        width: 100%; /* Full width input fields */
+        padding: 10px; /* Padding inside input fields */
+        margin-bottom: 20px; /* Bottom margin for input fields */
+        border: 1px solid #ccc; /* Border color */
+        border-radius: 4px; /* Rounded corners */
+        box-sizing: border-box; /* Include padding and border in element's total width */
+    }
+
+    button[type="submit"] {
+        background-color: #007bff; /* Button background color */
+        color: #fff; /* Button text color */
+        border: none; /* Remove button border */
+        border-radius: 4px; /* Rounded corners */
+        padding: 10px 20px; /* Padding inside button */
+        cursor: pointer; /* Change cursor to pointer on hover */
+        display: block; /* Display button as block element */
+        margin: 0 auto; /* Center align button */
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0056b3; /* Button background color on hover */
+    }
+</style>
+
+<body>
+<div style="padding-top: 300px; padding-bottom: 100px;">
+<div class="container">
+<h2>Edit Profile</h2>
+<form method="post">
+    {% csrf_token %}
+    <center>
+        
+        {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == "error" %}
+        <div class ="alert alert-danger" role="alert">
+        {{message}}
+        </div>
+        {% else %}
+        <div class="alert alert-success" role="alert">
+        {{message}}
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        </center>
+        <br>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" value="{{ data.username }}"><br>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" value="{{ data.email }}"><br>
+    <label for="mob_number">Mobile Number:</label>
+    <input type="text" id="mob_number" name="mob_number" value="{{ data.mob_number }}"><br>
+    <button type="submit">Save Changes</button>
+</form>
+</div>
+</div>
+</body>
+{% endblock %}

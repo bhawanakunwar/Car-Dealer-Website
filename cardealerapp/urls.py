@@ -28,14 +28,12 @@ urlpatterns=[
   path('car/<int:car_id>/', views.car_detail, name='car_detail'),
   path('purchase_car/<int:car_id>/', views.purchase_car, name='purchase_car'),
   path('financiers/', views.ContactFormSubmission1View.as_view(), name='financiers'), 
- 
+  
   path('book_test_drive/', views.book_test_drive, name='book_test_drive'),
  
   path('book_test_drive_from_car_detail/<int:car_id>/', views.book_test_drive_from_car_detail, name='book_test_drive_from_car_detail'),
-  #path('process_payment/', views.process_payment, name='process_payment'),
-
-  #path('loan_application/',views.loan_application,name='loan_application')
-  
+  path('cancel/service_booking/<int:booking_id>/', views.cancel_service_booking, name='cancel_service_booking'),
+   path('cancel/test_drive/<int:booking_id>/', views.cancel_test_drive, name='cancel_test_drive'),  
 ]
 
 

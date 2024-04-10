@@ -3,6 +3,7 @@ print("This is a test message")
 
 
 # views.py in your app
+from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import render, redirect
 from django.contrib.auth import login,logout, authenticate,get_user_model
 from django.contrib import messages
@@ -20,6 +21,46 @@ from django.contrib.auth import authenticate, login, logout
 from .tokens import generate_token
 import re
 
+def edit_profile(request):
+    if request.method == 'POST':
+        # Extract the data from the request
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        mob_number = request.POST.get('mob_number')
+        
+        # Validate the data
+        if not (username and email and mob_number):
+            messages.error(request, "All fields must be filled out")
+            return redirect('edit_profile')  # Redirect back to the edit profile page
+            
+        if not re.match(r'\S+@\S+\.\S+', email):
+            messages.error(request, "Invalid email address")
+            return redirect('edit_profile')  # Redirect back to the edit profile page
+        
+        if not re.match(r'^[0-9]{10}$', mob_number):
+            messages.error(request, "Invalid phone number. Phone number must be 10 digits")
+            return redirect('edit_profile')  # Redirect back to the edit profile page
+        
+        # Check if the email is already in use by another user
+        if User.objects.filter(email=email).exclude(id=request.user.id).exists():
+            messages.error(request, "Email already exists! Please try a different email.")
+            return redirect('edit_profile')  # Redirect back to the edit profile page
+        
+        # Check if the username is already in use by another user
+        if User.objects.filter(username=username).exclude(id=request.user.id).exists():
+            messages.error(request, "Username already exists! Please try a different username.")
+            return redirect('edit_profile')  # Redirect back to the edit profile page
+        
+        # Update the user's profile
+        user = request.user
+        user.username = username
+        user.email = email
+        user.mob_number = mob_number
+        user.save()
+        messages.success(request, 'Your profile has been updated successfully.')
+        return redirect('car_auth:edit_profile')
+    
+    return render(request, 'authentication/edit_profile.html')
 
 User = get_user_model()#Create your views here.
 def signup(request):
@@ -76,7 +117,40 @@ def signup(request):
     return render(request, "authentication/signup.html")
 
            
-    
+def change_password(request):
+    if request.method == 'POST':
+        # Extract the data from the request
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_new_password = request.POST.get('confirm_new_password')
+
+        # Check if current password matches
+        if not request.user.check_password(current_password):
+            messages.error(request, "Current password is incorrect.")
+            return redirect('car_auth:change_password')
+        
+        # Check if new password matches confirm password
+        if new_password != confirm_new_password:
+            messages.error(request, "New password and confirm password do not match.")
+            return redirect('car_auth:change_password')
+
+        # Check if new password is different from current password
+        if current_password == new_password:
+            messages.error(request, "New password must be different from current password.")
+            return redirect('car_auth:change_password')
+
+        # Update the user's password
+        user = request.user
+        user.set_password(new_password)
+        user.save()
+
+        # Update the session auth hash
+        update_session_auth_hash(request, user)
+
+        messages.success(request, "Your password has been changed successfully.")
+        return redirect('car_auth:change_password')
+
+    return render(request, 'authentication/change_password.html')   
 
 def handlelogin(request):
     

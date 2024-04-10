@@ -16,9 +16,46 @@
     width: 100%  !important;
     z-index: 1000  !important; /* Adjust z-index as needed */
 }
+.navbar form {
+        
+  position: relative; 
+  display: flex; /* Use flexbox for layout */
+  align-items: center; /* Align items vertically */
+}
+.navbar form input[type="text"] {
+  /* Add specific styles for the search input in the navbar */
+  padding: 8px; /* Adjust padding */
+  margin-right: 5px; /* Adjust margin */
+  border: 1px solid #ccc; /* Border color */
+  border-radius: 3px; /* Rounded corners */
+  width: 350px; 
+}
+
+.navbar form button[type="submit"] {
+  /* Add specific styles for the search button in the navbar */
+  position:absolute;
+  right: 400px;
+  top: 2px; 
+  background-color: #007bff; /* Button background color */
+  color: #fff; /* Button text color */
+  border: none; /* Remove button border */
+  border-radius: 3px; /* Rounded corners */
+  padding: 8px 15px; /* Padding inside button */
+  cursor: pointer; /* Change cursor to pointer on hover */
+  
+}
+
+.navbar form button[type="submit"]:hover {
+  background-color: #0056b3; /* Button background color on hover */
+}
  </style>
 <style>
- 
+  .body{
+    background-image:url("/static/assets/images/bg_image/car2.jpg");
+    background-size: cover; /* Cover the entire background */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Do not repeat the background image */
+  }
   
 
   .card {
@@ -29,13 +66,14 @@
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: #fff;
+    
     z-index: 1000;
     position: fixed;
-    top: calc(50% + 100px); /* Fixed at 50% from the top */
+    top: calc(50% + 120px); /* Fixed at 50% from the top */
     left: 50%; /* Fixed at 50% from the left */
     transform: translate(-50%, -50%);
     overflow-y: auto;  
-    height: 60%; 
+    height: 75%; 
     
   }
   h1 {
@@ -86,6 +124,7 @@
     text-decoration: underline;
   }
 </style>
+<body>
 <div class="fixed-container" style="padding-top:800px; padding-bottom: 100px;">
 <div class="card bg-light">
   <h2>Book Service</h2>
@@ -124,7 +163,7 @@
     <label for="car">Car:</label>
     <select id="car" name="car" required>
         {% for car in ordered_cars %}
-            <option value="{{ car.id }}">{{ car.car_name }}</option>
+            <option value="{{ car.car_name }}">{{ car.car_name }}</option>
         {% endfor %}
     </select>
 {% endif %}
@@ -181,6 +220,9 @@
 
 </div>
 </div>
+<div class="container" style ="padding:500px;">
+</div>
+</body>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -235,132 +277,55 @@
       }
 
   }
-  // Function to handle payment with Razorpay
-
-  function generateDateOptions() {
-    var select = document.getElementById("date");
+  function populateDates() {
     var today = new Date();
-    var currentHour = today.getHours();
-    var currentMinutes = today.getMinutes();
-
-    // If the current time is after the last available time slot,
-    // increment the date by 1 to select the next day
-    if (currentHour >= 17 || (currentHour === 16 && currentMinutes >= 0)) {
-      today.setDate(today.getDate() + 1);
-
-    }
-    select.innerHTML = '';
-
-    for (var i = 0; i < 7; i++) {
+    var dropdown = document.getElementById("date");
+    dropdown.innerHTML = "";
+    for (var i = 0; i < 8; i++) {
       var date = new Date(today);
       date.setDate(today.getDate() + i);
+      var offset = today.getTimezoneOffset(); // Get the timezone offset in minutes
+      date.setMinutes(date.getMinutes() + offset); // Add the offset to the date
+      
       var option = document.createElement("option");
-      option.value =  formatDate(date);
-      option.textContent = formatDateDisplay(date);
-      select.appendChild(option);
+      option.text = date.toDateString();
+      option.value = date.toISOString().split('T')[0];
+      dropdown.add(option);
     }
   }
-  function formatDate(date) {
-    return date.toISOString().slice(0, 10);
-  }
 
-  // Helper function to format date for display
-  function formatDateDisplay(date) {
-    return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  }
-
-  function generateTimeOptions() {
-      var select = document.getElementById("time");
-      var today = new Date();
-      var currentHour = today.getHours();
-      var currentMinute = today.getMinutes();
-      var times = [
-        "10:00 AM - 11:00 AM",
-        "11:00 AM - 12:00 PM",
-        "12:00 PM - 1:00 PM",
-        "1:00 PM - 2:00 PM",
-        "2:00 PM - 3:00 PM",
-        "3:00 PM - 4:00 PM",
-        "4:00 PM - 5:00 PM",
-        "5:00 PM - 6:00 PM"
-      ];
-
-       // Find the index of the current time in the times array
-
-        var startIndex = Math.floor((currentHour - 10) * 2);
-        if (currentMinute >= 30) {
-            startIndex += 1;
-        }
-        select.innerHTML='';
-
-       // Populate the time select dropdown with time slots starting from the current hour
-       for (var i = startIndex; i < times.length; i++) {
-           var option = document.createElement("option");
-           option.value = times[i];
-           option.textContent = times[i];
-           select.appendChild(option);
-       }
-
+  // Function to populate times dropdown
+  function populateTimes() {
+    var dropdown = document.getElementById("time");
+    dropdown.innerHTML = "";
+    var currentTime = new Date();
+    var currentHour = currentTime.getHours();
+    var currentMinute = currentTime.getMinutes();
+    var currentDay = currentTime.toDateString();
+    var selectedDate = new Date(document.getElementById("date").value);
+    var selectedDay = selectedDate.toDateString();
+    var startHour = (currentDay === selectedDay) ? (currentHour < 10 ? 10 : currentHour) : 10;
+    var endHour = 20; // 9 PM
+    for (var i = startHour; i <= endHour; i++) {
+      if (currentDay === selectedDay && (i < currentHour || (i === currentHour && currentMinute < 59))) {
+        continue; // Skip past time slots
+      }
+      var option = document.createElement("option");
+      var displayHour = i % 12 || 12; // Convert 0 to 12 for display
+      var amPm = i < 12 ? 'AM' : 'PM';
+      option.text = displayHour + ":00 " + amPm;
+      option.value = i;
+      dropdown.add(option);
     }
-
-
-    function validateForm() {
-        var location = document.getElementById("location").value;
-        var address = document.getElementById("address").value;
-        if (location === 'home' && address.trim() === '') {
-            alert("Please enter your address.");
-            return false;
-        }
-        return true;
-
-
-    }
-
-    var bookedDatesTimes =  [
-      {% for date, time in booked_dates_times %}
-      { date: new Date('{{ date.year }}', '{{ date.month|add:"-1" }}', '{{ date.day }}'),
-        time: '{{ time.hour }}:{{ time.minute }}:{{ time.second }}' }
-      {% if not forloop.last %},{% endif %}
-  {% endfor %}
-  ];
-  function filterBookedDatesTimes() {
-    var dateSelect = document.getElementById('date');
-    var timeSelect = document.getElementById('time');
-    var selectedDate = dateSelect.value;
-
-    // Filter out booked times for the selected date
-    var availableTimes = [
-        "10:00 AM - 11:00 AM",
-        "11:00 AM - 12:00 PM",
-        "12:00 PM - 1:00 PM",
-        "1:00 PM - 2:00 PM",
-        "2:00 PM - 3:00 PM",
-        "3:00 PM - 4:00 PM",
-        "4:00 PM - 5:00 PM",
-        "5:00 PM - 6:00 PM"
-    ];
-
-    availableTimes = availableTimes.filter(function(time) {
-        // Split the time range to get start and end times
-        var [start, end] = time.split(' - ');
-
-        // Convert the selected date to match the format in bookedDatesTimes
-        var selectedDateTime = new Date(selectedDate + ' ' + start);
-
-        // Check if the selected date and time is in bookedDatesTimes
-        return !bookedDatesTimes.some(function(dateTime) {
-            return dateTime.date.getTime() === selectedDateTime.getTime() && dateTime.time === start;
-        });
-    });
-
-    // Update options in the time select dropdown
-    timeSelect.innerHTML = '';
-    availableTimes.forEach(function(time) {
-        var option = document.createElement('option');
-        option.value = time;
-        option.textContent = time;
-        timeSelect.appendChild(option);
-    });
   }
+
+  // Call the functions to populate dropdowns
+  populateDates();
+  populateTimes();
+
+  // Add event listener to date dropdown to update time dropdown
+  document.getElementById("date").addEventListener("change", function() {
+    populateTimes();
+  });
 </script>
  {% endblock body %}

@@ -15,6 +15,38 @@
         width: 100%;
         z-index: 1000; /* Adjust z-index as needed */
     }
+    .navbar form {
+        
+        position: relative; 
+        display: flex; /* Use flexbox for layout */
+        align-items: center; /* Align items vertically */
+    }
+    .navbar form input[type="text"] {
+        /* Add specific styles for the search input in the navbar */
+        padding: 8px; /* Adjust padding */
+        margin-right: 5px; /* Adjust margin */
+        border: 1px solid #ccc; /* Border color */
+        border-radius: 3px; /* Rounded corners */
+        width: 350px; 
+    }
+    
+    .navbar form button[type="submit"] {
+        /* Add specific styles for the search button in the navbar */
+        position:absolute;
+        right: 400px;
+        top: 2px; 
+        background-color: #007bff; /* Button background color */
+        color: #fff; /* Button text color */
+        border: none; /* Remove button border */
+        border-radius: 3px; /* Rounded corners */
+        padding: 8px 15px; /* Padding inside button */
+        cursor: pointer; /* Change cursor to pointer on hover */
+        
+    }
+    
+    .navbar form button[type="submit"]:hover {
+        background-color: #0056b3; /* Button background color on hover */
+    }
 </style>
 <style>
     .car-container {

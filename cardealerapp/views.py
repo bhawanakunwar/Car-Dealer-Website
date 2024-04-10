@@ -42,10 +42,9 @@ def book_test_drive(request,car_id=None):
         location = request.POST.get('location')
         address = request.POST.get('address', '') # Address might not be present if location is 'center'
         date_str = request.POST.get('date')
-        time_range_str = request.POST.get('time')
+        time_str = request.POST.get('time')
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
-        start_time_str = time_range_str.split(' - ')[0]  # Extract the start time
-        time = datetime.strptime(start_time_str, '%I:%M %p').time() 
+        time = datetime.strptime(time_str, '%H').time() 
 
         test_drive = TestDrive(
             car_id=car_id,
@@ -67,10 +66,12 @@ def book_test_drive(request,car_id=None):
 
         # Return a JSON response indicating success
         messages.success(request,"Test Drive Booked Successfully")
-        return redirect('book_test_drive')
+        return redirect('user_history')
     else:
         # Handle GET requests for the form here if needed
         available_cars = Car.objects.all()  # Fetch available cars from the database
+       
+        
         return render(request, 'book_test_drive.html', {'available_cars': available_cars,'username': request.user.username})
 
     
@@ -88,11 +89,11 @@ def book_test_drive_from_car_detail(request, car_id):
         location = request.POST.get('location')
         address = request.POST.get('address', '') # Address might not be present if location is 'center'
         date_str = request.POST.get('date')
-        time_range_str = request.POST.get('time')
+        time_str = request.POST.get('time')
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
-        start_time_str = time_range_str.split(' - ')[0]  # Extract the start time
-        time = datetime.strptime(start_time_str, '%I:%M %p').time() 
+        time = datetime.strptime(time_str, '%H').time() 
 
+       
 
         # Save the form data to the database
         test_drive = TestDrive(
@@ -115,7 +116,7 @@ def book_test_drive_from_car_detail(request, car_id):
 
         # Return a JSON response indicating success
         messages.success(request,"Test Drive Booked Successfully")
-        return redirect('car_detail', car_id=car.id)
+        return redirect('user_history')
     else:
         
         available_cars = Car.objects.all()  # Fetch available cars from the database
@@ -134,14 +135,17 @@ def test_drive_success(request):
 def book_service(request,car_id=None):
     if request.method == 'POST':
         # Retrieve form data
-        car_id = request.POST.get('car')
-        car = get_object_or_404(Car, pk=car_id)
+        car_name = request.POST.get('car')
+        car = get_object_or_404(Car, car_name=car_name)
         customer_name = request.user.username  
         location = request.POST.get('location')
         address = request.POST.get('address', '')  # Address might not be present if location is 'center'
         service_type = request.POST.get('service_type')
-        date = request.POST.get('date')
-        time = request.POST.get('time')
+        date_str = request.POST.get('date')
+        time_str = request.POST.get('time')
+        date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        time = datetime.strptime(time_str, '%H').time() 
+
         comments = request.POST.get('comments')
 
         # Save the form data to the database
@@ -155,17 +159,19 @@ def book_service(request,car_id=None):
             time=time,
             comments=comments
         )
+
         current_datetime = datetime.now()
         if date < current_datetime.date() or (date == current_datetime.date() and time < current_datetime.time()):
-            service_booking.status = "Completed"
+            service_booking.status = "In Progress"
         elif date == current_datetime.date() and time == current_datetime.time():
             service_booking.status = "Pending"
         else:
-            service_booking.status = "Pending"
+             service_booking.status = "Pending"
+        
         service_booking.save()
 
         messages.success(request,"Service Booked Successfully")
-        return redirect('book_service')
+        return redirect('user_history')
         
     else:
         # Handle GET requests for the form here if needed
@@ -229,6 +235,8 @@ from .models import Reservation
 import uuid
 from datetime import datetime, timedelta
 from django.urls import reverse
+import random
+import string
 
 @login_required(login_url="/auth/login") 
 def payment_success(request):
@@ -238,7 +246,7 @@ def payment_success(request):
         payment_id = request.POST.get('razorpay_payment_id')
         
         # Generate a unique token ID
-        token_id = str(uuid.uuid4())
+        token_id = f"#{''.join(random.choices(string.digits, k=6))}"
         
         # Assuming user and car details are available in the request or can be fetched
         user = request.user  # Assuming user is authenticated
@@ -246,11 +254,14 @@ def payment_success(request):
         
         # Retrieve the car object
         car = Car.objects.get(pk=car_id)
-        current_date = timezone.now().date()
-        expiration_date = current_date + timedelta(days=7)
-        status = 'valid'
-        if expiration_date < current_date:
+        current_datetime = timezone.now()
+        expiration_datetime = current_datetime + timedelta(days=7)  # Assuming 7 days validity
+        
+        # Check if the reservation is expired
+        if expiration_datetime < current_datetime:
             status = 'expired'
+        else:
+            status = 'valid'
         # Create a new Reservation with the payment and order IDs
         reservation = Reservation.objects.create(
             user=user,
@@ -423,33 +434,23 @@ def user_history(request):
     current_time = datetime.now().time()
     
     for test_drive in test_drives:
-        time_str = test_drive.time
-        if " - " in time_str:
-            start_time_str, end_time_str = time_str.split(" - ")
-            start_time = datetime.strptime(start_time_str.strip(), '%I:%M %p').time()
-            end_time = datetime.strptime(end_time_str.strip(), '%I:%M %p').time()
-
-            if current_date > test_drive.date or (current_date == test_drive.date and current_time > end_time):
-                test_drive.status = "Completed"
-            elif current_date == test_drive.date and current_time >= start_time:
-                test_drive.status = "In Progress"
-            else:
-                test_drive.status = "Pending"
-
+        start_time = datetime.combine(test_drive.date, test_drive.time)
+        end_time = (start_time + timedelta(hours=1)).time()
+        if current_date > test_drive.date or (current_date == test_drive.date and current_time > start_time.time()):
+            test_drive.status = "Completed"
+        else:
+            test_drive.status = "Pending"
+    
     for service_booking in service_bookings:
-        time_str = service_booking.time
-        if " - " in time_str:
-            start_time_str, end_time_str = time_str.split(" - ")
-            start_time = datetime.strptime(start_time_str.strip(), '%I:%M %p').time()
-            end_time = datetime.strptime(end_time_str.strip(), '%I:%M %p').time()
+        start_time = datetime.combine(service_booking.date, service_booking.time)
+        end_time = (start_time + timedelta(hours=1)).time()
+        if current_date > service_booking.date or (current_date == service_booking.date and current_time > start_time.time()):
+            service_booking.status = "In Progress"
+        else:
+            service_booking.status = "Pending"
 
-            if current_date > service_booking.date or (current_date == service_booking.date and current_time > end_time):
-                service_booking.status = "Completed"
-            elif current_date == service_booking.date and current_time >= start_time:
-                service_booking.status = "In Progress"
-            else:
-                service_booking.status = "Pending"
 
+   
     for reservation in reservations:
         expiration_datetime = reservation.expiration_date
         if expiration_datetime.date() < current_date:
@@ -457,3 +458,35 @@ def user_history(request):
         else:
             reservation.status = "Valid"
     return render(request, 'user_history.html', {'service_bookings': service_bookings, 'test_drives': test_drives, 'loan_applications': loan_applications, 'reservations': reservations, 'orders': orders, 'current_date': current_date, 'current_time': current_time})
+
+def cancel_service_booking(request, booking_id):
+    # Get the service booking object
+    service_booking = get_object_or_404(ServiceBooking, id=booking_id)
+    
+    # Check if the booking belongs to the current user (optional)
+    if service_booking.customer_name != request.user.username:
+        # You can customize the error message based on your preference
+        messages.error(request, "You are not authorized to cancel this booking.")
+        return redirect('user_history')
+    
+    # Perform cancellation logic here (e.g., delete the booking)
+    service_booking.status = "Cancelled"
+    service_booking.save()
+    
+    # Redirect back to the user history page
+    return redirect('user_history')
+
+
+def cancel_test_drive(request, booking_id):
+    # Get the test drive object
+    test_drive = get_object_or_404(TestDrive, id=booking_id)
+    
+    # Check if the booking belongs to the current user (optional)
+    if test_drive.customer_name != request.user.username:
+        # You can customize the error message based on your preference
+        messages.error(request, "You are not authorized to cancel this booking.")
+        return redirect('user_history')
+    test_drive.status = "Cancelled"
+    test_drive.save()
+    
+    return redirect('user_history')

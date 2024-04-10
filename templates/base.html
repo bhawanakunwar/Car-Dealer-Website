@@ -69,7 +69,20 @@
     <![endif]-->
   </head>
   <style>
+    .navbar-nav .navbar-form button[type="submit"] {
+      background-color: #007bff; /* Button background color */
+      color: #fff; /* Button text color */
+      border: none; /* Remove button border */
+      border-radius: 5px; /* Rounded corners */
+      padding: 8px 16px; /* Padding inside button */
+      margin-left: 10px; /* Adjust margin as needed */
+      cursor: pointer; /* Change cursor to pointer on hover */
+      transition: background-color 0.3s ease; /* Smooth transition on hover */
+    }
     
+    .navbar-nav .navbar-form button[type="submit"]:hover {
+      background-color: #0056b3; /* Button background color on hover */
+    }
   .navbar-brand{
     width:200px;
     height:120px;
@@ -202,24 +215,7 @@
       <!-- top-area End -->
 
       {% block content %}
-      <div class="container">
-        
-           {% for message in messages  %}
-           <div class="alert alert-{{message.tags}} alert-dismissable fade show" role="alert">
-            <strong>{{message}}</strong>
-            <button type="button" class="btn-class" data-bs-dismiss="alert"
-             aria-label="Close"></button>
-           </div>
-           {% endfor %}
-
-
-
-
-
-
-
-
-        {% endblock content %}
+      {% endblock content %}
        
       </div>
     </section>
@@ -230,7 +226,11 @@
     
     
 
-    
+    <div id="container">
+
+    </div>
+    <div id="container">
+    </div>  
 
       <footer class="footer">
         <div class="container">

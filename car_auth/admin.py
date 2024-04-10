@@ -18,10 +18,18 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
-class CustomUserAdmin(UserAdmin):
+@admin.register(CustomUser)
+class CustomUserAdmin(admin.ModelAdmin):
+
     list_display = ('email', 'username', 'mob_number')  # Removed 'is_email_verified'
     list_filter = ('is_staff', 'is_superuser', 'groups', 'user_permissions')
-    search_fields = ('email', 'username', 'mob_number')
-    ordering = ('email',)
+    
+    ordering = ('username',)
+    def active(self,obj):
+        return obj.is_active == 1
+    active.boolean= True
+    
+    def has_add_permission(self, request):
+        return False
+    
 
-admin.site.register(CustomUser, CustomUserAdmin)
