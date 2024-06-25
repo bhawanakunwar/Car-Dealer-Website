@@ -70,7 +70,6 @@ def book_test_drive(request,car_id=None):
     else:
         # Handle GET requests for the form here if needed
         available_cars = Car.objects.all()  # Fetch available cars from the database
-       
         
         return render(request, 'book_test_drive.html', {'available_cars': available_cars,'username': request.user.username})
 
@@ -438,14 +437,18 @@ def user_history(request):
         end_time = (start_time + timedelta(hours=1)).time()
         if current_date > test_drive.date or (current_date == test_drive.date and current_time > start_time.time()):
             test_drive.status = "Completed"
+        elif test_drive.status == "Cancelled":
+            test_drive.status = "Cancelled"  # Set status to "Cancelled" if already cancelled
         else:
             test_drive.status = "Pending"
-    
+       
     for service_booking in service_bookings:
         start_time = datetime.combine(service_booking.date, service_booking.time)
         end_time = (start_time + timedelta(hours=1)).time()
         if current_date > service_booking.date or (current_date == service_booking.date and current_time > start_time.time()):
             service_booking.status = "In Progress"
+        elif service_booking.status == "Cancelled":
+            service_booking.status = "Cancelled"
         else:
             service_booking.status = "Pending"
 

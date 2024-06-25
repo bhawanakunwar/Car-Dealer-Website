@@ -192,7 +192,7 @@
       <input type="text" id="address" name="address" placeholder="Enter address" >
     </div>
     <div id="centerAddress" style="display: none;">
-      Car Zone Address: 123 Center Street, City, Country
+      Car Zone Address: 123 Center Street, Ahmedabad
     </div>
     <br>
     
@@ -315,17 +315,13 @@
     }
     
 }
- // Function to populate dates dropdown
- function populateDates() {
+function populateDates() {
   var today = new Date();
   var dropdown = document.getElementById("date");
   dropdown.innerHTML = "";
   for (var i = 0; i < 8; i++) {
     var date = new Date(today);
     date.setDate(today.getDate() + i);
-    var offset = today.getTimezoneOffset(); // Get the timezone offset in minutes
-    date.setMinutes(date.getMinutes() + offset); // Add the offset to the date
-      
     var option = document.createElement("option");
     option.text = date.toDateString();
     option.value = date.toISOString().split('T')[0];
@@ -343,16 +339,22 @@ function populateTimes() {
   var currentDay = currentTime.toDateString();
   var selectedDate = new Date(document.getElementById("date").value);
   var selectedDay = selectedDate.toDateString();
-  var startHour = (currentDay === selectedDay) ? (currentHour < 10 ? 10 : currentHour) : 10;
+  
+  // Check if the selected date is today
+  var isToday = selectedDay === currentDay;
+
+  // Calculate the starting hour based on whether it's today or not
+  var startHour = isToday ? currentHour : 10;
+
+  // If it's today and the selected time is in the past, start from the next hour
+  if (isToday && startHour <= currentHour) {
+    startHour = currentHour + 1;
+  }
+
   var endHour = 20; // 9 PM
   for (var i = startHour; i <= endHour; i++) {
-    if (currentDay === selectedDay && (i < currentHour || (i === currentHour && currentMinute < 59))) {
-      continue; // Skip past time slots
-    }
     var option = document.createElement("option");
-    var displayHour = i % 12 || 12; // Convert 0 to 12 for display
-    var amPm = i < 12 ? 'AM' : 'PM';
-    option.text = displayHour + ":00 " + amPm;
+    option.text = (i < 12 ? i : i - 12) + ":00 " + (i < 12 ? 'AM' : 'PM');
     option.value = i;
     dropdown.add(option);
   }
@@ -361,6 +363,17 @@ function populateTimes() {
 // Call the functions to populate dropdowns
 populateDates();
 populateTimes();
+
+// Add event listener to date dropdown to update time dropdown
+document.getElementById("date").addEventListener("change", function() {
+  populateTimes();
+});
+
+
+// Call the functions to populate dropdowns
+populateDates();
+populateTimes();
+
 
 // Add event listener to date dropdown to update time dropdown
 document.getElementById("date").addEventListener("change", function() {

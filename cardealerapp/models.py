@@ -60,6 +60,7 @@ class ServiceBooking(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('Completed', 'Completed'),
+        ('Cancelled', 'Cancelled'),
         ('In Progress', 'In Progress'),
     ]
     customer_name = models.CharField(max_length=100)
@@ -73,13 +74,15 @@ class ServiceBooking(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     comments = models.TextField(blank=True, null=True)
 
-
+    
    
 
     def __str__(self):
         return f"Service Booking for {self.car} at {self.location} on {self.date} from {self.time}"
 # cardealerapp/models.py
 from django.utils import timezone
+
+
 class TestDrive(models.Model):
     LOCATION_CHOICES = [
         ('carzone', 'Carzone Center'),
@@ -100,9 +103,9 @@ class TestDrive(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
 
     
-   
-    def __str__(self):
-        return f"Test Drive of {self.car} at {self.location} on {self.date} from {self.time}"
+
+def __str__(self):
+ return f"Test Drive of {self.car} at {self.location} on {self.date} from {self.time}"
 
 class Financier(models.Model):
     name = models.CharField(max_length=100)

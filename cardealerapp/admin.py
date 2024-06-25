@@ -22,13 +22,8 @@ class ServiceBookingAdmin(admin.ModelAdmin):
     list_display = ['customer_name', 'car', 'service_type', 'date', 'time', 'location', 'address', 'created_at', 'comments']
     list_filter = ['service_type', 'location', 'status',('date', DateFieldListFilter)]  # Add filters for service type, location, and status
    
-    def active(self,obj):
-        return obj.is_active == 1
-    active.boolean= True
     
-    def has_add_permission(self, request):
-        return False
-
+    
     def generate_pdf_report(self, request, queryset):
         # Get the selected service bookings from the queryset
         selected_service_bookings = queryset
@@ -42,9 +37,9 @@ class ServiceBookingAdmin(admin.ModelAdmin):
         elements = []
 
         # Table data
-        data = [['Service Booking ID', 'Customer', 'Car', 'Service Type', 'Date', 'Time', 'Location', 'Address', 'Created At', 'Comments']]
+        data = [[ 'Customer', 'Car', 'Service Type', 'Date','Location',]]
         for service_booking in selected_service_bookings:
-            data.append([service_booking.id, service_booking.customer_name, service_booking.car, service_booking.service_type, service_booking.date, service_booking.time, service_booking.location, service_booking.address, service_booking.created_at, service_booking.comments])
+            data.append([ service_booking.customer_name, service_booking.car, service_booking.service_type, service_booking.date, service_booking.location, service_booking.status])
 
         # Create table
         table = Table(data)
@@ -70,12 +65,8 @@ class TestDriveAdmin(admin.ModelAdmin):
     list_filter = ['location', 'status',('date', DateFieldListFilter)]  # Add filters for location and status
    
     
-    def active(self,obj):
-        return obj.is_active == 1
-    active.boolean= True
     
-    def has_add_permission(self, request):
-        return False
+    
     
     def generate_pdf_report(self, request, queryset):
         # Get the selected test drives from the queryset
@@ -90,9 +81,9 @@ class TestDriveAdmin(admin.ModelAdmin):
         elements = []
 
         # Table data
-        data = [['Test Drive ID', 'Customer', 'Car', 'Date', 'Time', 'Location', 'Address', 'Created At', 'Status']]
+        data = [['Test Drive ID', 'Customer', 'Car', 'Date', 'Time', 'Location']]
         for test_drive in selected_test_drives:
-            data.append([test_drive.id, test_drive.customer_name, test_drive.car, test_drive.date, test_drive.time, test_drive.location, test_drive.address, test_drive.created_at, test_drive.status])
+            data.append([test_drive.id, test_drive.customer_name, test_drive.car, test_drive.date, test_drive.time, test_drive.location,])
 
         # Create table
         table = Table(data)
@@ -140,7 +131,7 @@ class LoanApplicationAdmin(admin.ModelAdmin):
         return False
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
-    list_display = ['user', 'car', 'reservation_date', 'expiration_date', 'token_amount', 'is_active']
+    list_display = ['token_id','user', 'car','reservation_date', 'expiration_date', 'token_amount', 'is_active']
     list_filter = ['status', 'is_active', ('reservation_date', DateFieldListFilter)]  # Add filters for status and is_active
    
     def active(self,obj):
@@ -163,9 +154,9 @@ class ReservationAdmin(admin.ModelAdmin):
         elements = []
 
         # Table data
-        data = [['Reservation ID', 'User', 'Car', 'Reservation Date', 'Expiration Date', 'Token Amount', 'Is Active']]
+        data = [['Reservation ID', 'User', 'Car', 'Reservation Date']]
         for reservation in selected_reservations:
-            data.append([reservation.id, reservation.user.username, reservation.car, reservation.reservation_date, reservation.expiration_date, reservation.token_amount, reservation.is_active])
+            data.append([reservation.token_id, reservation.user.username, reservation.car, reservation.reservation_date])
 
         # Create table
         table = Table(data)
